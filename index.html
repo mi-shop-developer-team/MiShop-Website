@@ -450,7 +450,7 @@
         <i data-lucide="check" class="w-8 h-8"></i>
       </div>
       <h3 class="text-lg font-black text-brandBlack mb-1">প্রোফাইল সেভ সম্পন্ন!</h3>
-      <p class="text-xs text-gray-400 mb-6 leading-relaxed">ওমর ভাই, আপনার দেওয়া ডেলিভারি তথ্য এবং মোবাইল নম্বরটি সফলভাবে ফায়ারস্টোরে আপডেট করা হয়েছে।</p>
+      <p class="text-xs text-gray-400 mb-6 leading-relaxed">আপনার দেওয়া ডেলিভারি তথ্য এবং মোবাইল নম্বরটি সফলভাবে ফায়ারস্টোরে আপডেট করা হয়েছে।</p>
       <button onclick="closeSuccessDialog()" class="w-full bg-brandBlue text-white py-3 rounded-2xl font-black text-xs btn-bounce shadow-lg shadow-cyan-500/20">ঠিক আছে</button>
     </div>
   </div>
@@ -534,7 +534,6 @@
 
     window.onload = async function() {
       lucide.createIcons();
-      // RULE 3: ফায়ারস্টোরে কুয়েরি করার আগে অবশ্যই অ্যানোনিমাস অথবা গুগল অথ নিশ্চিত করা হচ্ছে
       await initAuthAndLaunch();
       updateCartBadge();
       injectDynamicManifest();
@@ -613,7 +612,6 @@
         }
       });
 
-      // মেথডটি কল করে ফায়ারস্টোর ডেটা ফেচ শুরু করা হচ্ছে
       fetchInitialData();
     }
 
@@ -638,7 +636,7 @@
 
     window.saveProfileInfo = async function() {
       if (!currentUser || currentUser.isAnonymous) {
-        showToast("তথ্য সংরক্ষণ করতে গুগলে লগইন করুন!", "user-lock", "red-500");
+        showToast("정보 저장하려면 구글 로그인 필요!", "user-lock", "red-500");
         return;
       }
       
@@ -656,7 +654,6 @@
       btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> সেভ হচ্ছে...`;
 
       try {
-        // RULE 1: /artifacts/{appId}/users/{userId}/profile/info
         await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'info'), {
           name: currentUser.displayName,
           email: currentUser.email,
@@ -697,7 +694,6 @@
     };
 
     function fetchInitialData() {
-      // RULE 1: /artifacts/{appId}/public/data/categories
       const catQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'categories'));
       onSnapshot(catQuery, (snapshot) => {
         categoriesList = [];
@@ -707,7 +703,6 @@
         renderCategories();
       }, (error) => console.error("Categories fetch error: ", error));
 
-      // RULE 1: /artifacts/{appId}/public/data/products
       const prodQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'products'));
       onSnapshot(prodQuery, (snapshot) => {
         productsList = [];
@@ -719,7 +714,6 @@
         document.getElementById('products-grid').classList.remove('hidden');
       }, (error) => console.error("Products fetch error: ", error));
 
-      // RULE 1: /artifacts/{appId}/public/data/siteSettings/deliveryCharges
       const chargeDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'siteSettings', 'deliveryCharges');
       onSnapshot(chargeDocRef, (snapshot) => {
         if (snapshot.exists()) {
