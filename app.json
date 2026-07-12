@@ -1,0 +1,23 @@
+
+{
+  "name": "MiShop BD",
+  "short_name": "MiShop",
+  "description": "Premium Online Shopping in Bangladesh",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10B981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://mishopbd.vercel.app/mishoplogo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://mishopbd.vercel.app/mishoplogo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
