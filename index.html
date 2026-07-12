@@ -8,7 +8,7 @@
     <title>Online Clothing Shop in Bangladesh | MiShop BD</title>
     <meta name="description" content="MiShop BD - Online clothing shop in Bangladesh. Buy mens, womens and kids t-shirts, panjabi, dresses and more with home delivery in Dhaka and all over Bangladesh.">
 
-    <!-- Main Keywords (Focused, high-intent) -->
+    <!-- Main Keywords -->
     <meta name="keywords" content="
     online clothing shop bangladesh, online dress shop bangladesh, online t shirt shop bangladesh,
     tshirt shop bangladesh, mens tshirt bangladesh, womens dress bangladesh, kids panjabi bangladesh,
@@ -23,7 +23,7 @@
     abaya shop bangladesh, panjabi shop dhaka, tshirt shop dhaka, dress shop dhaka
     ">
 
-    <!-- Bangla + Banglish Keywords (Local search style) -->
+    <!-- Bangla + Banglish Keywords -->
     <meta name="keywords" content="
     বাংলাদেশ অনলাইন শপ, বাংলাদেশ কাপড়ের দোকান, বাংলাদেশ অনলাইন কাপড়ের শপ, বাংলাদেশ অনলাইন টি শার্ট শপ,
     বাংলাদেশ অনলাইন পাঞ্জাবি শপ, বাংলাদেশ অনলাইন ড্রেস শপ, অনলাইনে কাপড় কিনবো, বাংলাদেশে অনলাইন কাপড় কিভাবে কিনবো,
@@ -35,7 +35,7 @@
     online jama kapor bd, jama kapor online bangladesh, jama kapor online dhaka
     ">
 
-    <!-- Long-tail & intent-based Keywords (Category/Product + intent) -->
+    <!-- Long-tail Keywords -->
     <meta name="keywords" content="
     buy tshirt online bangladesh, buy dress online bangladesh, buy panjabi online bangladesh,
     buy hoodie online bangladesh, buy kids dress online bangladesh, buy mens tshirt online bangladesh,
@@ -49,7 +49,7 @@
     premium clothing brand bangladesh, local clothing brand bangladesh, bd brand tshirt online, bd brand panjabi online
     ">
 
-    <!-- Location Modifiers (Dhaka + Bangladesh) -->
+    <!-- Location Modifiers -->
     <meta name="keywords" content="
     online clothing shop dhaka, tshirt shop dhaka online, dress shop dhaka online, panjabi shop dhaka online,
     fashion brand dhaka, clothing brand dhaka, best clothing brand dhaka, best fashion brand dhaka,
@@ -58,21 +58,21 @@
     dhaka online shopping panjabi, dhaka fashion brand online, dhaka clothing store online
     ">
 
-    <!-- Brand & Branded Search -->
+    <!-- Brand Search -->
     <meta name="keywords" content="
     mishop, mishop bd, mishop bangladesh, mishop clothing brand, mishop fashion brand,
     mishop tshirt, mishop panjabi, mishop dress, mishop online shop, mishop online clothing store,
     mishop online fashion store, mishop review, mishop bd review, mishop bd tshirt, mishop bd panjabi, mishop bd dress
     ">
 
-    <!-- ================= OPEN GRAPH (For WhatsApp/Facebook Link Previews) ================= -->
+    <!-- ================= OPEN GRAPH (For Link Previews) ================= -->
     <meta property="og:title" content="MiShop BD | Premium Online Clothing Shop in Bangladesh">
     <meta property="og:description" content="Buy men's, women's, and kids' dresses with home delivery all over Bangladesh.">
     <meta property="og:image" content="https://mishopbd.vercel.app/mishopthamnale.jpg">
     <meta property="og:url" content="https://mishopbd.vercel.app">
     <meta property="og:type" content="website">
     
-    <!-- Twitter Card data (For extra compatibility) -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://mishopbd.vercel.app/mishopthamnale.jpg">
 
@@ -80,7 +80,7 @@
     <link id="manifest-link" rel="manifest">
     <meta name="theme-color" content="#10B981" id="meta-theme-color">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -158,6 +158,13 @@
     <!-- Toast -->
     <div id="toast-container" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none w-11/12 max-w-sm"></div>
 
+    <!-- WhatsApp Order Success Modal -->
+    <div id="order-success-modal" class="fixed inset-0 bg-dark/80 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300" id="osm-content">
+            <!-- Dynamically injected via JS -->
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -173,7 +180,7 @@
 
         const state = { user: null, profile: null, products: [], categories: [], orders: [], settings: {}, cart: JSON.parse(localStorage.getItem('mishop_cart')) || [], currentTab: 'home', previousTab: 'home', currentProduct: null, searchQuery: '' };
 
-        // === PWA LOGIC (Dynamic Service Worker & Manifest) ===
+        // === PWA LOGIC ===
         const initPWA = () => {
             const manifest = {
                 name: "MiShop BD", short_name: "MiShop", display: "standalone", start_url: ".",
@@ -389,23 +396,120 @@
                 </div>`;
         };
 
+        // ==========================================
+        // NEW FEATURE: WhatsApp Order Confirmation
+        // ==========================================
         window.handleCheckout = async (e) => {
             e.preventDefault();
             if(!state.user || state.user.isAnonymous) { showToast("Please log in to order.", "error"); navigate('profile'); return; }
-            const btn = document.getElementById('checkout-btn'); btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>`; btn.disabled = true;
+            
+            const name = document.getElementById('co-name').value;
+            const phone = document.getElementById('co-phone').value;
+            const address = document.getElementById('co-address').value;
+            const total = state.cart.reduce((s, i) => s + (i.currentPrice * i.quantity), 0);
+            
+            const btn = document.getElementById('checkout-btn'); 
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Processing...`; 
+            btn.disabled = true;
+
             try {
+                // 1. Save to Firestore for Admin Panel
                 await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'), {
-                    userId: state.user.uid, customerName: document.getElementById('co-name').value, phone: document.getElementById('co-phone').value, address: document.getElementById('co-address').value,
-                    items: state.cart, total: state.cart.reduce((s, i) => s + (i.currentPrice * i.quantity), 0), status: "Pending", timestamp: serverTimestamp()
+                    userId: state.user.uid, 
+                    customerName: name, 
+                    phone: phone, 
+                    address: address,
+                    items: state.cart, 
+                    total: total, 
+                    status: "Pending", 
+                    timestamp: serverTimestamp()
                 });
-                state.cart = []; updateCartBadge(); showToast("Order placed successfully! 🎉");
-                await fetchUserData(); navigate('profile');
-            } catch (error) { showToast("Failed to place order.", "error"); btn.innerHTML = `Place Order`; btn.disabled = false; }
+
+                // 2. Prepare Dynamic WhatsApp Text
+                let waText = `*নতুন অর্ডার! (MiShop BD)* 🛍️\n\n`;
+                waText += `*নাম:* ${name}\n`;
+                waText += `*ফোন:* ${phone}\n`;
+                waText += `*ঠিকানা:* ${address}\n\n`;
+                waText += `*অর্ডার লিস্ট:*\n`;
+                state.cart.forEach((item, index) => {
+                    waText += `${index + 1}. ${item.quantity}x ${item.name} - ৳${item.currentPrice * item.quantity}\n`;
+                });
+                waText += `\n*সর্বমোট:* ৳${total}\n\n`;
+                waText += `অনুগ্রহ করে আমার অর্ডারটি কনফার্ম করুন।`;
+                
+                const waLink = `https://wa.me/8801572922663?text=${encodeURIComponent(waText)}`;
+
+                // 3. Clear Cart & Update Badge
+                state.cart = []; 
+                updateCartBadge(); 
+                await fetchUserData(); 
+
+                // 4. Show Beautiful Order Success Modal
+                showOrderSuccessModal(waLink);
+
+            } catch (error) { 
+                showToast("Failed to place order.", "error"); 
+                btn.innerHTML = `Place Order`; 
+                btn.disabled = false; 
+            }
         };
 
+        window.showOrderSuccessModal = (waLink) => {
+            const modal = document.getElementById('order-success-modal');
+            const content = document.getElementById('osm-content');
+            
+            const svgWA = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.88-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
+            
+            content.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="bg-green-100 text-green-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="check-circle" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 mb-2">অর্ডার সফল হয়েছে! 🎉</h2>
+                    <p class="text-sm text-gray-500 leading-relaxed">আপনার অর্ডারটি আমাদের ডাটাবেসে সেভ হয়েছে। দ্রুত ডেলিভারির জন্য দয়া করে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন অথবা সরাসরি কল করুন।</p>
+                </div>
+                
+                <div class="space-y-3">
+                    <a href="${waLink}" target="_blank" onclick="closeOrderSuccessModal()" class="w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 active:scale-95 transition-transform shadow-lg shadow-green-500/30">
+                        ${svgWA} হোয়াটসঅ্যাপে কনফার্ম করুন
+                    </a>
+                    
+                    <a href="tel:+8801572922663" class="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 active:scale-95 transition-transform">
+                        <i data-lucide="phone-call" class="w-5 h-5"></i> +8801572922663 এ কল করুন
+                    </a>
+                </div>
+                
+                <button onclick="closeOrderSuccessModal()" class="mt-6 w-full text-sm font-bold text-gray-500 hover:text-gray-900">
+                    Close & View Orders
+                </button>
+            `;
+            
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        };
+
+        window.closeOrderSuccessModal = () => {
+            const modal = document.getElementById('order-success-modal');
+            const content = document.getElementById('osm-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                navigate('profile'); 
+            }, 300);
+        };
+        // ==========================================
+
         const renderProfile = () => {
-            const svgFB = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
-            const svgWA = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.88-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
+            const svgFB = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
+            const svgWA = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.88-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
 
             if (!state.user || state.user.isAnonymous) {
                 return `
