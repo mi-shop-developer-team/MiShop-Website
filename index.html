@@ -22,111 +22,112 @@
             theme: {
                 extend: {
                     colors: {
-                        emerald: { 500: '#10B981' },
+                        emerald: { 500: '#10B981', 600: '#059669' },
                         cyan: { 500: '#06B6D4' },
-                        yellow: { 400: '#FBBF24' },
                         dark: '#111827'
-                    },
-                    animation: {
-                        'bounce-slight': 'bounce-slight 0.2s ease-in-out',
-                    },
-                    keyframes: {
-                        'bounce-slight': {
-                            '0%, 100%': { transform: 'scale(1)' },
-                            '50%': { transform: 'scale(0.95)' },
-                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Hide scrollbar for a cleaner look */
         ::-webkit-scrollbar { display: none; }
-        .glass-header { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(243, 244, 246, 0.8); }
         .nav-active { background: rgba(16, 185, 129, 0.15); color: #10B981; border-radius: 9999px; }
         .hide { display: none !important; }
+        .slider-img { scroll-snap-align: center; flex: 0 0 100%; object-fit: cover; }
+        .slider-container { scroll-snap-type: x mandatory; overflow-x: auto; display: flex; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased pb-20 selection:bg-emerald-200">
 
-    <!-- Sticky Glass Header -->
-    <header class="fixed top-0 w-full z-50 glass-header px-4 py-3 flex items-center justify-between shadow-sm transition-all">
-        <div class="flex items-center gap-3">
-            <img src="https://mishopbd.vercel.app/mishoplogo.jpg" alt="MiShop Logo" class="h-10 w-10 rounded-full shadow-md object-cover border border-gray-100">
-            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-cyan-500">MiShop</h1>
+    <!-- App Install Banner (PWA) -->
+    <div id="install-banner" class="hidden bg-dark text-white px-4 py-2 flex justify-between items-center text-sm z-[60] relative">
+        <div class="flex items-center gap-2">
+            <img src="https://mishopbd.vercel.app/mishoplogo.jpg" class="w-6 h-6 rounded">
+            <span>Install <strong>MiShop</strong> App</span>
         </div>
-        <div class="relative w-1/2 max-w-xs hidden sm:block" id="desktop-search">
-            <input type="text" id="searchInputDesk" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 rounded-full bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm">
-            <i data-lucide="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400"></i>
+        <button onclick="hideInstallBanner()" class="bg-emerald-500 px-3 py-1 rounded-full font-bold active:scale-95 text-xs">Install</button>
+    </div>
+
+    <!-- Sticky Glass Header -->
+    <header class="fixed top-0 w-full z-50 glass-header px-4 py-3 shadow-sm transition-all flex flex-col justify-center" id="main-header">
+        <div class="flex items-center justify-between w-full max-w-7xl mx-auto">
+            <!-- Back Button (Only visible on subpages) -->
+            <button id="back-btn" onclick="goBack()" class="hidden mr-3 p-2 bg-gray-100 rounded-full active:scale-95 text-gray-700">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
+                <img src="https://mishopbd.vercel.app/mishoplogo.jpg" alt="MiShop Logo" class="h-10 w-10 rounded-full shadow-sm object-cover border border-gray-100">
+                <h1 class="text-xl font-bold tracking-tight text-dark">Mi<span class="text-emerald-500">Shop</span></h1>
+            </div>
+
+            <div class="relative flex-1 max-w-xs ml-auto hidden sm:block" id="desktop-search">
+                <input type="text" id="searchInputDesk" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100/50 border border-transparent focus:bg-white focus:border-emerald-500 focus:outline-none transition-all text-sm">
+                <i data-lucide="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400"></i>
+            </div>
         </div>
     </header>
 
-    <!-- Mobile Search Bar (Below Header) -->
+    <!-- Mobile Search Bar (Below Header on Home/Category) -->
     <div class="pt-20 px-4 pb-2 sm:hidden w-full transition-all" id="mobile-search-container">
         <div class="relative w-full">
-            <input type="text" id="searchInputMob" placeholder="Search products..." class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm">
+            <input type="text" id="searchInputMob" placeholder="Search products or categories..." class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm">
             <i data-lucide="search" class="absolute left-3 top-3.5 h-5 w-5 text-gray-400"></i>
         </div>
     </div>
 
     <!-- Main Content Area -->
-    <main id="app-content" class="min-h-screen pt-4 sm:pt-20 px-4 max-w-7xl mx-auto transition-opacity duration-300">
+    <main id="app-content" class="min-h-screen pt-4 sm:pt-20 px-4 max-w-7xl mx-auto transition-opacity duration-300 mb-6">
         <!-- Content injected by JS -->
-        <div id="loader" class="flex flex-col items-center justify-center h-[60vh]">
+        <div class="flex flex-col items-center justify-center h-[60vh]">
             <i data-lucide="loader-2" class="h-10 w-10 text-emerald-500 animate-spin"></i>
-            <p class="mt-4 text-gray-500 font-medium tracking-wide">Loading MiShop...</p>
+            <p class="mt-4 text-gray-500 font-medium">Loading amazing products...</p>
         </div>
     </main>
 
     <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 px-6 py-2 pb-safe">
+    <nav id="bottom-nav" class="fixed bottom-0 w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 px-6 py-2 pb-safe transition-transform duration-300">
         <ul class="flex justify-between items-center max-w-md mx-auto">
             <li>
-                <button onclick="navigate('home')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400 hover:text-emerald-500" data-tab="home">
+                <button onclick="navigate('home')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="home">
                     <i data-lucide="home" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-semibold">Home</span>
+                    <span class="text-[10px] mt-1 font-bold">Home</span>
                 </button>
             </li>
             <li>
-                <button onclick="navigate('categories')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400 hover:text-emerald-500" data-tab="categories">
+                <button onclick="navigate('categories')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="categories">
                     <i data-lucide="layout-grid" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-semibold">Categories</span>
+                    <span class="text-[10px] mt-1 font-bold">Category</span>
                 </button>
             </li>
             <li class="relative">
-                <button onclick="navigate('cart')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400 hover:text-emerald-500" data-tab="cart">
-                    <i data-lucide="shopping-cart" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-semibold">Cart</span>
-                    <span id="cart-badge" class="absolute top-1 right-2 bg-yellow-400 text-dark text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full shadow-sm hidden">0</span>
+                <button onclick="navigate('cart')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="cart">
+                    <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                    <span class="text-[10px] mt-1 font-bold">Cart</span>
+                    <span id="cart-badge" class="absolute top-1 right-2 bg-emerald-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full shadow-sm hidden border border-white">0</span>
                 </button>
             </li>
             <li>
-                <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400 hover:text-emerald-500" data-tab="profile">
+                <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="profile">
                     <i data-lucide="user" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-semibold">Profile</span>
+                    <span class="text-[10px] mt-1 font-bold">Profile</span>
                 </button>
             </li>
         </ul>
     </nav>
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none w-11/12 max-w-sm"></div>
 
-    <!-- Modals -->
-    <div id="product-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] hidden flex items-end sm:items-center justify-center transition-opacity opacity-0">
-        <div class="bg-white w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 transform translate-y-full sm:translate-y-0 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="product-modal-content">
-            <!-- Injected dynamically -->
-        </div>
-    </div>
-
-    <!-- Application Logic -->
+    <!-- Firebase App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, increment, addDoc, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, increment, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (from prompt)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDx6oI0OStR52vYJgIy86m60WROz29bqEo",
             authDomain: "mi-shop-online-shopping-bd.firebaseapp.com",
@@ -149,9 +150,28 @@
             products: [],
             categories: [],
             orders: [],
+            settings: {},
             cart: JSON.parse(localStorage.getItem('mishop_cart')) || [],
             currentTab: 'home',
+            previousTab: 'home',
+            currentProduct: null,
             searchQuery: ''
+        };
+
+        // Custom App Install Banner (PWA)
+        setTimeout(() => {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                // Already installed
+            } else {
+                document.getElementById('install-banner').classList.remove('hidden');
+                document.getElementById('main-header').classList.remove('fixed', 'top-0');
+                document.getElementById('main-header').classList.add('sticky', 'top-0');
+            }
+        }, 3000);
+
+        window.hideInstallBanner = () => {
+            document.getElementById('install-banner').classList.add('hidden');
+            showToast("Use browser menu to 'Add to Home Screen'");
         };
 
         // UI Helpers
@@ -159,46 +179,71 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const colorClass = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-dark';
-            toast.className = `${colorClass} text-white px-6 py-3 rounded-full shadow-lg font-medium text-sm transition-all transform scale-95 opacity-0 translate-y-4 flex items-center gap-2`;
-            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4"></i> ${message}`;
+            toast.className = `${colorClass} text-white px-5 py-3 rounded-2xl shadow-xl font-medium text-sm transition-all transform scale-95 opacity-0 flex items-center gap-3`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 shrink-0"></i> <span>${message}</span>`;
             container.appendChild(toast);
             lucide.createIcons();
             
             requestAnimationFrame(() => {
-                toast.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
-                toast.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+                toast.classList.remove('scale-95', 'opacity-0');
             });
-            
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                toast.classList.add('opacity-0', '-translate-y-4');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         };
 
-        window.navigate = (tab) => {
+        // Navigation Engine
+        window.navigate = (tab, payload = null) => {
+            if(state.currentTab !== tab) state.previousTab = state.currentTab;
             state.currentTab = tab;
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.tab === tab) {
-                    btn.classList.add('nav-active');
-                    btn.classList.remove('text-gray-400');
-                } else {
-                    btn.classList.remove('nav-active');
-                    btn.classList.add('text-gray-400');
-                }
-            });
             
-            const searchContainer = document.getElementById('mobile-search-container');
-            const searchDesk = document.getElementById('desktop-search');
-            if (tab === 'home' || tab === 'categories') {
-                searchContainer.classList.remove('hidden');
-                searchDesk.classList.remove('opacity-0', 'pointer-events-none');
-            } else {
-                searchContainer.classList.add('hidden');
-                searchDesk.classList.add('opacity-0', 'pointer-events-none');
+            // Handle bottom nav active states
+            const validTabs = ['home', 'categories', 'cart', 'profile'];
+            if(validTabs.includes(tab)) {
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if(btn.dataset.tab === tab) {
+                        btn.classList.add('nav-active');
+                        btn.classList.remove('text-gray-400');
+                    } else {
+                        btn.classList.remove('nav-active');
+                        btn.classList.add('text-gray-400');
+                    }
+                });
             }
+
+            // Header UI logic (Show/hide back button & search)
+            const searchMob = document.getElementById('mobile-search-container');
+            const searchDesk = document.getElementById('desktop-search');
+            const backBtn = document.getElementById('back-btn');
+            const bottomNav = document.getElementById('bottom-nav');
+
+            if (tab === 'home' || tab === 'categories') {
+                searchMob.classList.remove('hidden');
+                searchDesk.classList.remove('opacity-0', 'pointer-events-none');
+                backBtn.classList.add('hidden');
+                bottomNav.style.transform = 'translateY(0)';
+            } else if (tab === 'product' || tab === 'page') {
+                searchMob.classList.add('hidden');
+                searchDesk.classList.add('opacity-0', 'pointer-events-none');
+                backBtn.classList.remove('hidden');
+                // Hide bottom nav on full product page to give more space
+                bottomNav.style.transform = 'translateY(100%)';
+            } else {
+                searchMob.classList.add('hidden');
+                searchDesk.classList.add('opacity-0', 'pointer-events-none');
+                backBtn.classList.add('hidden');
+                bottomNav.style.transform = 'translateY(0)';
+            }
+            
+            if(tab === 'product' && payload) state.currentProduct = payload;
             
             renderApp();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.goBack = () => {
+            navigate(state.previousTab !== 'product' ? state.previousTab : 'home');
         };
 
         const updateCartBadge = () => {
@@ -207,33 +252,53 @@
             if (count > 0) {
                 badge.innerText = count;
                 badge.classList.remove('hidden');
-                badge.classList.add('animate-bounce-slight');
-                setTimeout(() => badge.classList.remove('animate-bounce-slight'), 200);
             } else {
                 badge.classList.add('hidden');
             }
             localStorage.setItem('mishop_cart', JSON.stringify(state.cart));
         };
 
-        window.addToCart = (productId, preventModal = false) => {
+        window.addToCart = (productId) => {
             const product = state.products.find(p => p.id === productId);
             if (!product) return;
             
+            const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
             const existing = state.cart.find(i => i.id === productId);
+            
+            if (existing && existing.quantity >= stock) {
+                showToast("Cannot add more. Out of stock!", "error");
+                return;
+            }
+
+            if (stock <= 0) {
+                showToast("Product is out of stock.", "error");
+                return;
+            }
+
             if (existing) {
                 existing.quantity++;
             } else {
                 state.cart.push({ ...product, quantity: 1 });
             }
+            
             updateCartBadge();
-            showToast(`${product.name} added to cart`);
-            if(!preventModal && state.currentTab === 'cart') renderApp();
+            showToast(`${product.name} added to cart!`);
+            if(state.currentTab === 'cart' || state.currentTab === 'product') renderApp();
         };
 
         window.updateCartQty = (productId, delta) => {
             const index = state.cart.findIndex(i => i.id === productId);
             if (index > -1) {
-                state.cart[index].quantity += delta;
+                const product = state.products.find(p => p.id === productId);
+                const stock = product?.stock !== undefined ? parseInt(product.stock) : 999;
+                
+                const newQty = state.cart[index].quantity + delta;
+                if(newQty > stock) {
+                    showToast("Not enough stock available.", "error");
+                    return;
+                }
+                
+                state.cart[index].quantity = newQty;
                 if (state.cart[index].quantity <= 0) {
                     state.cart.splice(index, 1);
                 }
@@ -242,51 +307,23 @@
             }
         };
 
-        // PWA Manifest Injection
-        const injectPWA = () => {
-            const manifest = {
-                name: "MiShop BD",
-                short_name: "MiShop",
-                description: "Premium Online Shopping in Bangladesh",
-                start_url: "/",
-                display: "standalone",
-                background_color: "#ffffff",
-                theme_color: "#10B981",
-                icons: [
-                    {
-                        src: "https://mishopbd.vercel.app/mishoplogo.jpg",
-                        sizes: "192x192",
-                        type: "image/jpeg"
-                    },
-                    {
-                        src: "https://mishopbd.vercel.app/mishoplogo.jpg",
-                        sizes: "512x512",
-                        type: "image/jpeg"
-                    }
-                ]
-            };
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
-        };
-
-        // Data Fetching
+        // Data Fetching (PUBLIC - Runs BEFORE auth)
         const fetchPublicData = async () => {
             try {
-                // Categories
-                const catSnap = await getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'categories'));
-                state.categories = catSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                const [catSnap, prodSnap, setSnap] = await Promise.all([
+                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'categories')),
+                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'products')),
+                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'siteSettings'))
+                ]);
                 
-                // Products
-                const prodSnap = await getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'products'));
+                state.categories = catSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
                 state.products = prodSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                setSnap.docs.forEach(doc => { state.settings[doc.id] = doc.data(); });
+                
+                renderApp(); // Render immediately once products arrive
             } catch (error) {
                 console.error("Data fetch error:", error);
-                showToast("Failed to load products. Retrying...", "error");
+                showToast("Failed to load products. Check internet.", "error");
             }
         };
 
@@ -294,136 +331,75 @@
             if (!state.user || state.user.isAnonymous) return;
             try {
                 const profileDoc = await getDoc(doc(db, 'artifacts', APP_ID, 'users', state.user.uid, 'profile', 'info'));
-                if (profileDoc.exists()) {
-                    state.profile = profileDoc.data();
-                }
+                if (profileDoc.exists()) state.profile = profileDoc.data();
                 
-                // Orders (No complex query, fetch all and filter in JS)
                 const ordersSnap = await getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'));
                 state.orders = ordersSnap.docs
                     .map(doc => ({id: doc.id, ...doc.data()}))
                     .filter(o => o.userId === state.user.uid)
-                    .sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds); // Descending
-                    
+                    .sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds);
             } catch (e) {
                 console.error("User data fetch error:", e);
             }
         };
 
-        // Render Functions
-        const renderProductCard = (product) => `
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer transition-transform hover:-translate-y-1 group" onclick="viewProduct('${product.id}')">
-                <div class="relative h-48 w-full overflow-hidden bg-gray-100">
+        // Views Component Renders
+        const renderProductCard = (product) => {
+            const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
+            const isOutOfStock = stock <= 0;
+            
+            return `
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer transition-transform hover:-translate-y-1 group relative flex flex-col" onclick="navigate('product', '${product.id}')">
+                <div class="relative h-48 w-full overflow-hidden bg-gray-100 shrink-0">
                     <img src="${product.imageUrl || 'https://via.placeholder.com/400'}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
-                    <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold text-gray-700 shadow-sm">
+                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold text-gray-700 shadow">
                         <i data-lucide="eye" class="w-3 h-3 text-emerald-500"></i> ${product.views || 0}
                     </div>
-                    ${product.oldPrice ? `<div class="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-[10px] font-bold shadow-sm">SALE</div>` : ''}
+                    ${product.oldPrice ? `<div class="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-[10px] font-black tracking-wide shadow">SALE</div>` : ''}
+                    ${isOutOfStock ? `<div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center"><span class="bg-dark text-white font-bold px-3 py-1 rounded text-xs uppercase">Out of Stock</span></div>` : ''}
                 </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-gray-900 text-sm truncate mb-1">${product.name}</h3>
-                    <div class="flex justify-between items-end mt-2">
+                <div class="p-3 sm:p-4 flex flex-col flex-1">
+                    ${product.subCategory ? `<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">${product.subCategory}</span>` : ''}
+                    <h3 class="font-bold text-gray-900 text-sm line-clamp-2 leading-tight mb-2">${product.name}</h3>
+                    <div class="mt-auto flex justify-between items-end">
                         <div>
-                            <p class="text-emerald-500 font-extrabold text-lg flex items-center">৳${product.currentPrice}</p>
-                            ${product.oldPrice ? `<p class="text-gray-400 text-xs line-through">৳${product.oldPrice}</p>` : ''}
+                            <p class="text-emerald-600 font-black text-lg flex items-center leading-none">৳${product.currentPrice}</p>
+                            ${product.oldPrice ? `<p class="text-gray-400 text-xs line-through mt-0.5">৳${product.oldPrice}</p>` : ''}
                         </div>
-                        <button onclick="event.stopPropagation(); addToCart('${product.id}')" class="bg-dark text-white p-2 rounded-xl active:scale-95 transition-all shadow-md hover:bg-emerald-500 group-hover:bg-emerald-500">
+                        <button onclick="event.stopPropagation(); addToCart('${product.id}')" class="${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-dark text-white hover:bg-emerald-500'} p-2 rounded-xl active:scale-95 transition-all shadow-md group-hover:bg-emerald-500">
                             <i data-lucide="plus" class="w-5 h-5"></i>
                         </button>
                     </div>
                 </div>
             </div>
-        `;
-
-        window.viewProduct = async (id) => {
-            const product = state.products.find(p => p.id === id);
-            if(!product) return;
-            
-            // Increment view (Optimistic UI + Firestore)
-            product.views = (product.views || 0) + 1;
-            renderApp(); // re-render to show updated view count
-            
-            try {
-                // Rule-compliant strict update using increment
-                await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'products', id), {
-                    views: increment(1)
-                });
-            } catch (e) {
-                console.error("View increment error:", e);
-            }
-
-            const modal = document.getElementById('product-modal');
-            const content = document.getElementById('product-modal-content');
-            
-            content.innerHTML = `
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-gray-900">Product Details</h2>
-                    <button onclick="closeModal()" class="p-2 bg-gray-100 rounded-full active:scale-95"><i data-lucide="x" class="w-5 h-5"></i></button>
-                </div>
-                <img src="${product.imageUrl}" class="w-full h-64 object-cover rounded-2xl mb-4 bg-gray-100">
-                <h3 class="text-2xl font-black text-gray-900 mb-2">${product.name}</h3>
-                <div class="flex gap-4 items-center mb-4">
-                    <span class="text-emerald-500 font-black text-2xl">৳${product.currentPrice}</span>
-                    ${product.oldPrice ? `<span class="text-gray-400 line-through">৳${product.oldPrice}</span>` : ''}
-                    <span class="ml-auto flex items-center gap-1 text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                        <i data-lucide="eye" class="w-4 h-4"></i> ${product.views}
-                    </span>
-                </div>
-                ${product.sizes ? `
-                <div class="mb-4">
-                    <p class="text-sm font-bold text-gray-700 mb-2">Available Sizes:</p>
-                    <div class="flex gap-2 flex-wrap">
-                        ${product.sizes.split(',').map(s => `<span class="px-3 py-1 border border-gray-200 rounded-md text-sm font-medium text-gray-600">${s.trim()}</span>`).join('')}
-                    </div>
-                </div>` : ''}
-                <div class="mb-6">
-                    <p class="text-sm font-bold text-gray-700 mb-2">Description:</p>
-                    <p class="text-gray-600 text-sm whitespace-pre-wrap">${product.description || 'No description available.'}</p>
-                </div>
-                ${product.youtubeLink ? `
-                <a href="${product.youtubeLink}" target="_blank" class="w-full mb-4 flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3 rounded-xl font-bold active:scale-95 transition-transform border border-red-100">
-                    <i data-lucide="youtube" class="w-5 h-5"></i> Watch Review
-                </a>` : ''}
-                <button onclick="addToCart('${product.id}', true); closeModal();" class="w-full bg-emerald-500 text-white py-4 rounded-xl font-black text-lg active:scale-95 shadow-lg shadow-emerald-500/30 transition-transform">
-                    Add to Cart - ৳${product.currentPrice}
-                </button>
             `;
-            
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('translate-y-full');
-            }, 10);
-            lucide.createIcons();
-        };
-
-        window.closeModal = () => {
-            const modal = document.getElementById('product-modal');
-            const content = document.getElementById('product-modal-content');
-            modal.classList.add('opacity-0');
-            content.classList.add('translate-y-full');
-            setTimeout(() => modal.classList.add('hidden'), 300);
         };
 
         const renderHome = () => {
             let displayProducts = state.products;
             if (state.searchQuery) {
                 const q = state.searchQuery.toLowerCase();
-                displayProducts = displayProducts.filter(p => p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q)));
+                displayProducts = displayProducts.filter(p => 
+                    p.name.toLowerCase().includes(q) || 
+                    (p.category && p.category.toLowerCase().includes(q)) ||
+                    (p.subCategory && p.subCategory.toLowerCase().includes(q))
+                );
             }
 
             return `
-                <div class="mb-6">
-                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Trending Now</h2>
-                    <p class="text-sm text-gray-500 mt-1">Discover our most popular picks.</p>
+                <div class="mb-6 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-900 tracking-tight">Trending Now</h2>
+                        <p class="text-sm text-gray-500 mt-1">Discover our most popular picks.</p>
+                    </div>
                 </div>
                 ${displayProducts.length > 0 ? `
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     ${displayProducts.map(p => renderProductCard(p)).join('')}
                 </div>` : `
                 <div class="text-center py-20 text-gray-400">
                     <i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                    <p class="font-medium text-lg">No products found.</p>
+                    <p class="font-medium text-lg text-gray-600">No products found.</p>
                 </div>`}
             `;
         };
@@ -431,26 +407,122 @@
         const renderCategories = () => {
             return `
                 <div class="mb-6">
-                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Categories</h2>
+                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Browse Categories</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     ${state.categories.length > 0 ? state.categories.map(c => `
-                        <div onclick="setSearch('${c.name}')" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 cursor-pointer active:scale-95 transition-transform hover:border-emerald-500 group">
+                        <div onclick="setSearch('${c.name}')" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 cursor-pointer active:scale-95 transition-all hover:border-emerald-500 hover:shadow-md group">
                             <div class="bg-emerald-50 p-4 rounded-full group-hover:bg-emerald-100 transition-colors">
                                 <i data-lucide="${c.iconId || 'box'}" class="w-8 h-8 text-emerald-500"></i>
                             </div>
-                            <span class="font-bold text-gray-700 text-center">${c.name}</span>
+                            <span class="font-bold text-gray-800 text-center text-sm">${c.name}</span>
                         </div>
                     `).join('') : '<p class="text-gray-500 col-span-2 text-center py-10">No categories found.</p>'}
                 </div>
             `;
         };
-        
+
         window.setSearch = (term) => {
-            document.getElementById('searchInputMob').value = term;
-            document.getElementById('searchInputDesk').value = term;
+            const desk = document.getElementById('searchInputDesk');
+            const mob = document.getElementById('searchInputMob');
+            if(desk) desk.value = term;
+            if(mob) mob.value = term;
             state.searchQuery = term;
             navigate('home');
+        };
+
+        // FULL PAGE PRODUCT DETAILS (Replaces Modal)
+        const renderProductDetails = () => {
+            const product = state.products.find(p => p.id === state.currentProduct);
+            if(!product) return `<p class="text-center py-10">Product not found.</p>`;
+
+            // Optimistic view increment
+            if(!product.viewedThisSession) {
+                product.views = (product.views || 0) + 1;
+                product.viewedThisSession = true;
+                updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'products', product.id), {
+                    views: increment(1)
+                }).catch(e => console.error(e));
+            }
+
+            const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
+            const isOutOfStock = stock <= 0;
+            
+            // Handle Multiple Images
+            let images = [];
+            if(product.additionalImages) {
+                images = product.additionalImages.split(',').map(s => s.trim()).filter(s => s);
+            }
+            images.unshift(product.imageUrl); // Main image always first
+
+            // Related Products
+            const related = state.products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+
+            return `
+                <div class="pb-10 pt-2 animate-fade-in max-w-2xl mx-auto">
+                    <!-- Image Slider -->
+                    <div class="relative w-full h-[40vh] sm:h-[60vh] bg-gray-100 rounded-3xl overflow-hidden mb-6 shadow-sm border border-gray-100">
+                        <div class="slider-container h-full w-full">
+                            ${images.map(img => `<img src="${img}" class="slider-img">`).join('')}
+                        </div>
+                        ${images.length > 1 ? `<div class="absolute bottom-3 right-3 bg-dark/70 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur"><i data-lucide="images" class="w-3 h-3"></i> Swipe</div>` : ''}
+                    </div>
+                    
+                    <div class="px-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                ${product.subCategory ? `<p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">${product.subCategory}</p>` : ''}
+                                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">${product.name}</h1>
+                            </div>
+                            <span class="flex items-center gap-1 text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
+                                <i data-lucide="eye" class="w-4 h-4"></i> ${product.views}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-6">
+                            <span class="text-emerald-500 font-black text-3xl">৳${product.currentPrice}</span>
+                            ${product.oldPrice ? `<span class="text-gray-400 line-through text-lg font-medium">৳${product.oldPrice}</span>` : ''}
+                            ${stock > 0 && stock <= 5 ? `<span class="ml-auto text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">Only ${stock} left!</span>` : ''}
+                        </div>
+
+                        ${product.sizes ? `
+                        <div class="mb-6">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Available Sizes</p>
+                            <div class="flex gap-2 flex-wrap">
+                                ${product.sizes.split(',').map(s => `<span class="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-sm font-bold text-gray-700">${s.trim()}</span>`).join('')}
+                            </div>
+                        </div>` : ''}
+
+                        <div class="mb-8 bg-white p-5 rounded-2xl border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Product Description</p>
+                            <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">${product.description || 'No description available.'}</p>
+                        </div>
+
+                        ${product.youtubeLink ? `
+                        <a href="${product.youtubeLink}" target="_blank" class="w-full mb-6 flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3.5 rounded-2xl font-bold active:scale-95 transition-all hover:bg-red-100">
+                            <i data-lucide="youtube" class="w-5 h-5"></i> Watch Video Review
+                        </a>` : ''}
+
+                        <!-- Related Products -->
+                        ${related.length > 0 ? `
+                        <div class="mt-10 mb-6 border-t border-gray-200 pt-8">
+                            <h3 class="text-lg font-black text-gray-900 mb-4">You May Also Like</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${related.map(p => renderProductCard(p)).join('')}
+                            </div>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- Sticky Add to cart -->
+                    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 pb-safe z-50">
+                        <div class="max-w-2xl mx-auto flex gap-3">
+                            <button onclick="addToCart('${product.id}')" class="flex-1 ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-emerald-500 text-white active:scale-95 shadow-lg shadow-emerald-500/20'} py-4 rounded-2xl font-black text-lg transition-all flex justify-center items-center gap-2">
+                                ${isOutOfStock ? 'Out of Stock' : `<i data-lucide="shopping-bag" class="w-5 h-5"></i> Add to Cart - ৳${product.currentPrice}`}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
         };
 
         const renderCart = () => {
@@ -459,12 +531,12 @@
             if (state.cart.length === 0) {
                 return `
                     <div class="flex flex-col items-center justify-center h-[60vh] text-center">
-                        <div class="bg-gray-100 p-6 rounded-full mb-6">
-                            <i data-lucide="shopping-bag" class="w-16 h-16 text-gray-400"></i>
+                        <div class="bg-emerald-50 p-6 rounded-full mb-6">
+                            <i data-lucide="shopping-cart" class="w-16 h-16 text-emerald-500"></i>
                         </div>
                         <h2 class="text-2xl font-black text-gray-900 mb-2">Your cart is empty</h2>
                         <p class="text-gray-500 mb-8">Looks like you haven't added anything yet.</p>
-                        <button onclick="navigate('home')" class="bg-dark text-white px-8 py-3 rounded-xl font-bold active:scale-95 transition-transform hover:bg-emerald-500">Start Shopping</button>
+                        <button onclick="navigate('home')" class="bg-dark text-white px-8 py-3.5 rounded-xl font-bold active:scale-95 transition-all">Start Shopping</button>
                     </div>
                 `;
             }
@@ -475,14 +547,14 @@
                         <h2 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Your Cart</h2>
                         ${state.cart.map(item => `
                             <div class="flex items-center gap-4 bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-gray-100">
-                                <img src="${item.imageUrl}" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl bg-gray-50">
+                                <img src="${item.imageUrl}" class="w-20 h-20 object-cover rounded-xl bg-gray-50">
                                 <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 text-sm sm:text-base line-clamp-1">${item.name}</h4>
+                                    <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${item.name}</h4>
                                     <p class="text-emerald-500 font-black text-lg">৳${item.currentPrice}</p>
                                     <div class="flex items-center gap-4 mt-2">
-                                        <div class="flex items-center gap-3 bg-gray-100 rounded-lg px-2 py-1">
+                                        <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1">
                                             <button onclick="updateCartQty('${item.id}', -1)" class="p-1 active:scale-95"><i data-lucide="minus" class="w-4 h-4 text-gray-600"></i></button>
-                                            <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
+                                            <span class="font-bold text-sm w-4 text-center text-gray-800">${item.quantity}</span>
                                             <button onclick="updateCartQty('${item.id}', 1)" class="p-1 active:scale-95"><i data-lucide="plus" class="w-4 h-4 text-gray-600"></i></button>
                                         </div>
                                     </div>
@@ -491,20 +563,19 @@
                         `).join('')}
                     </div>
                     
-                    <div class="w-full lg:w-96 bg-white p-6 rounded-3xl shadow-lg border border-gray-100 sticky top-24">
+                    <div class="w-full lg:w-96 bg-white p-6 rounded-3xl shadow-lg border border-gray-100 lg:sticky lg:top-24">
                         <h3 class="text-lg font-black text-gray-900 mb-4">Order Summary</h3>
-                        <div class="flex justify-between mb-2 text-gray-600"><span>Subtotal</span><span class="font-bold">৳${subtotal}</span></div>
-                        <div class="flex justify-between mb-4 text-gray-600"><span>Shipping</span><span class="font-bold">Calculated later</span></div>
-                        <div class="flex justify-between mb-6 text-xl font-black text-gray-900 border-t border-gray-100 pt-4">
+                        <div class="flex justify-between mb-2 text-gray-600 text-sm"><span>Subtotal</span><span class="font-bold">৳${subtotal}</span></div>
+                        <div class="flex justify-between mb-6 text-xl font-black text-gray-900 border-t border-gray-100 pt-4 mt-4">
                             <span>Total</span><span class="text-emerald-500">৳${subtotal}</span>
                         </div>
                         
                         <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-4">
-                            <input type="text" id="co-name" placeholder="Full Name" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="${state.user?.displayName || ''}">
-                            <input type="tel" id="co-phone" placeholder="Phone Number" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="${state.profile?.phone || ''}">
-                            <textarea id="co-address" placeholder="Delivery Address" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none h-24">${state.profile?.address || ''}</textarea>
+                            <input type="text" id="co-name" placeholder="Full Name" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" value="${state.user?.displayName || ''}">
+                            <input type="tel" id="co-phone" placeholder="Phone Number" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" value="${state.profile?.phone || ''}">
+                            <textarea id="co-address" placeholder="Complete Delivery Address" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none h-24 font-medium">${state.profile?.address || ''}</textarea>
                             <button type="submit" id="checkout-btn" class="w-full bg-emerald-500 text-white py-4 rounded-xl font-black text-lg active:scale-95 shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="check-circle" class="w-5 h-5"></i> Place Order
+                                Place Order Now
                             </button>
                         </form>
                     </div>
@@ -515,7 +586,7 @@
         window.handleCheckout = async (e) => {
             e.preventDefault();
             if(!state.user || state.user.isAnonymous) {
-                showToast("Please log in from Profile to place an order.", "error");
+                showToast("Please log in to place an order.", "error");
                 navigate('profile');
                 return;
             }
@@ -536,7 +607,6 @@
             };
 
             try {
-                // Rule compliant order creation
                 await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'), orderData);
                 state.cart = [];
                 updateCartBadge();
@@ -544,50 +614,67 @@
                 await fetchUserData(); // refresh orders
                 navigate('profile');
             } catch (error) {
-                console.error("Checkout error:", error);
                 showToast("Failed to place order.", "error");
-                btn.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> Place Order`;
+                btn.innerHTML = `Place Order Now`;
                 btn.disabled = false;
-                lucide.createIcons();
             }
         };
 
         const renderProfile = () => {
+            // Unauthenticated View
             if (!state.user || state.user.isAnonymous) {
                 return `
-                    <div class="flex flex-col items-center justify-center h-[70vh] text-center max-w-md mx-auto">
-                        <div class="bg-emerald-50 p-6 rounded-full mb-6 relative">
-                            <i data-lucide="shield-check" class="w-16 h-16 text-emerald-500"></i>
-                            <div class="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-sm">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6">
-                            </div>
-                        </div>
-                        <h2 class="text-2xl font-black text-gray-900 mb-3">Secure Login</h2>
-                        <p class="text-gray-500 mb-8 px-4 text-sm">Sign in with Google to save your profile, track live orders, and manage permanent delivery details.</p>
-                        <button onclick="loginWithGoogle()" class="w-full bg-white border-2 border-gray-200 text-gray-800 py-4 px-6 rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-3 hover:border-emerald-500 hover:bg-emerald-50">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6">
+                    <div class="flex flex-col items-center justify-center min-h-[70vh] text-center max-w-sm mx-auto">
+                        <img src="https://mishopbd.vercel.app/mishoplogo.jpg" class="w-24 h-24 rounded-full mb-6 shadow-md border border-gray-100">
+                        <h2 class="text-2xl font-black text-gray-900 mb-2">Welcome to MiShop</h2>
+                        <p class="text-gray-500 mb-8 text-sm px-4">Sign in with Google to manage orders, save your delivery details, and shop seamlessly.</p>
+                        <button onclick="loginWithGoogle()" class="w-full bg-white border border-gray-200 shadow-sm text-gray-800 py-3.5 px-6 rounded-xl font-bold active:scale-95 transition-all flex items-center justify-center gap-3 hover:bg-gray-50">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
                             Continue with Google
                         </button>
+                        
+                        <div class="mt-10 pt-6 border-t border-gray-200 w-full">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Connect with us</p>
+                            <div class="flex gap-4 justify-center">
+                                <a href="https://wa.me/8801572922663" target="_blank" class="bg-green-100 p-3 rounded-full text-green-600 active:scale-95 transition-transform"><i data-lucide="message-circle" class="w-6 h-6"></i></a>
+                                <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="bg-blue-100 p-3 rounded-full text-blue-600 active:scale-95 transition-transform"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+                                <a href="https://hikmah.net/@mishopbd" target="_blank" class="bg-gray-100 p-3 rounded-full active:scale-95 transition-transform"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-6 h-6 rounded-full object-cover"></a>
+                            </div>
+                        </div>
                     </div>
                 `;
             }
 
+            // Authenticated View
             return `
                 <div class="max-w-2xl mx-auto pb-10">
-                    <div class="bg-dark rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden mb-8">
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-3xl opacity-20 -mr-20 -mt-20 pointer-events-none"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
-                            <img src="${state.user.photoURL || 'https://via.placeholder.com/100'}" class="w-24 h-24 rounded-full border-4 border-emerald-500/30 object-cover shadow-lg">
-                            <div class="flex-1">
-                                <h2 class="text-2xl font-black mb-1">${state.user.displayName}</h2>
-                                <p class="text-gray-400 text-sm mb-4">${state.user.email}</p>
-                                <button onclick="logout()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors active:scale-95 flex items-center gap-2 mx-auto md:mx-0">
-                                    <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-                                </button>
-                            </div>
+                    <!-- Profile Header & Socials -->
+                    <div class="bg-white rounded-3xl p-6 text-center shadow-sm border border-gray-100 mb-6 flex flex-col items-center">
+                        <img src="${state.user.photoURL || 'https://via.placeholder.com/100'}" class="w-20 h-20 rounded-full border-4 border-emerald-50 object-cover shadow-sm mb-3">
+                        <h2 class="text-xl font-black text-gray-900">${state.user.displayName}</h2>
+                        <p class="text-gray-500 text-sm mb-4">${state.user.email}</p>
+                        <button onclick="logout()" class="text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-bold transition-colors active:scale-95 flex items-center gap-2">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                        </button>
+                        
+                        <div class="flex gap-4 mt-6">
+                            <a href="https://wa.me/8801572922663" target="_blank" class="bg-green-100 p-2.5 rounded-full text-green-600 active:scale-95 shadow-sm"><i data-lucide="message-circle" class="w-5 h-5"></i></a>
+                            <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="bg-blue-100 p-2.5 rounded-full text-blue-600 active:scale-95 shadow-sm"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                            <a href="https://hikmah.net/@mishopbd" target="_blank" class="bg-gray-100 p-2.5 rounded-full active:scale-95 shadow-sm"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-5 h-5 rounded-full object-cover"></a>
                         </div>
                     </div>
 
+                    <!-- Information Pages Links -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <button onclick="navigate('page', 'about')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95">
+                            <i data-lucide="info" class="w-5 h-5 text-emerald-500"></i> About Us
+                        </button>
+                        <button onclick="navigate('page', 'privacy')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95">
+                            <i data-lucide="shield" class="w-5 h-5 text-emerald-500"></i> Privacy Policy
+                        </button>
+                    </div>
+
+                    <!-- Delivery Details -->
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-8">
                         <h3 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
                             <i data-lucide="map-pin" class="text-emerald-500"></i> Permanent Delivery Info
@@ -595,28 +682,27 @@
                         <form onsubmit="saveProfile(event)" class="space-y-4">
                             <div>
                                 <label class="text-xs font-bold text-gray-500 uppercase ml-1">Phone Number</label>
-                                <input type="tel" id="prof-phone" class="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" value="${state.profile?.phone || ''}">
+                                <input type="tel" id="prof-phone" class="w-full p-3.5 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-emerald-500 outline-none font-medium" value="${state.profile?.phone || ''}">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-gray-500 uppercase ml-1">Default Address</label>
-                                <textarea id="prof-address" class="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none resize-none h-24">${state.profile?.address || ''}</textarea>
+                                <textarea id="prof-address" class="w-full p-3.5 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-emerald-500 outline-none resize-none h-20 font-medium">${state.profile?.address || ''}</textarea>
                             </div>
-                            <button type="submit" id="save-prof-btn" class="bg-gray-900 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors active:scale-95 w-full sm:w-auto">Save Details</button>
+                            <button type="submit" id="save-prof-btn" class="bg-dark text-white px-6 py-3.5 rounded-xl font-bold text-sm active:scale-95 w-full">Save Details</button>
                         </form>
                     </div>
 
+                    <!-- Orders -->
                     <div>
                         <h3 class="text-xl font-black text-gray-900 mb-4">My Orders</h3>
                         <div class="space-y-4">
                             ${state.orders.length > 0 ? state.orders.map(order => {
                                 const orderDate = order.timestamp ? new Date(order.timestamp.seconds * 1000) : new Date();
-                                const isCancelable = order.status === 'Pending' && ((new Date() - orderDate) < 3 * 60 * 60 * 1000); // 3 hours
+                                const isCancelable = order.status === 'Pending' && ((new Date() - orderDate) < 3 * 60 * 60 * 1000);
                                 
-                                const statusColors = {
-                                    'Pending': 'bg-yellow-100 text-yellow-700',
-                                    'Processing': 'bg-blue-100 text-blue-700',
-                                    'Shipped': 'bg-purple-100 text-purple-700',
-                                    'Delivered': 'bg-emerald-100 text-emerald-700',
+                                const colors = {
+                                    'Pending': 'bg-yellow-100 text-yellow-700', 'Processing': 'bg-blue-100 text-blue-700',
+                                    'Shipped': 'bg-purple-100 text-purple-700', 'Delivered': 'bg-emerald-100 text-emerald-700',
                                     'Cancelled': 'bg-red-100 text-red-700'
                                 };
                                 
@@ -624,12 +710,12 @@
                                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                                     <div class="flex justify-between items-start mb-4">
                                         <div>
-                                            <p class="text-xs text-gray-500 font-medium">Order #${order.id.slice(0,8).toUpperCase()}</p>
-                                            <p class="text-sm font-bold text-gray-900 mt-1">${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}</p>
+                                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wide">ID: #${order.id.slice(0,6)}</p>
+                                            <p class="text-sm font-medium text-gray-900 mt-1">${orderDate.toLocaleDateString()}</p>
                                         </div>
-                                        <span class="${statusColors[order.status] || 'bg-gray-100 text-gray-700'} px-3 py-1 rounded-full text-xs font-bold">${order.status}</span>
+                                        <span class="${colors[order.status] || 'bg-gray-100 text-gray-700'} px-3 py-1 rounded-full text-xs font-bold">${order.status}</span>
                                     </div>
-                                    <div class="border-t border-gray-50 pt-4 mb-4 space-y-2">
+                                    <div class="border-t border-gray-50 pt-3 space-y-1 mb-3">
                                         ${order.items.map(item => `
                                             <div class="flex justify-between text-sm">
                                                 <span class="text-gray-600 line-clamp-1">${item.quantity}x ${item.name}</span>
@@ -637,20 +723,17 @@
                                             </div>
                                         `).join('')}
                                     </div>
-                                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                                        <span class="font-medium text-gray-500">Total Paid</span>
+                                    <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                                        <span class="font-bold text-gray-500">Total</span>
                                         <span class="font-black text-emerald-500 text-lg">৳${order.total}</span>
                                     </div>
                                     ${isCancelable ? `
-                                        <button onclick="cancelOrder('${order.id}')" class="mt-4 w-full bg-red-50 text-red-600 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform border border-red-100 hover:bg-red-500 hover:text-white">
-                                            Cancel Order
-                                        </button>
+                                        <button onclick="cancelOrder('${order.id}')" class="mt-4 w-full bg-red-50 text-red-600 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-all">Cancel Order</button>
                                     ` : ''}
                                 </div>
                                 `;
                             }).join('') : `
-                                <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
-                                    <i data-lucide="package" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                                <div class="text-center py-10 bg-white rounded-2xl border border-gray-100 border-dashed">
                                     <p class="text-gray-500 font-medium">No orders yet.</p>
                                 </div>
                             `}
@@ -660,28 +743,35 @@
             `;
         };
 
+        const renderPage = () => {
+            const pageType = state.currentProduct; // reusing payload parameter
+            const title = pageType === 'about' ? 'About Us' : 'Privacy Policy';
+            const content = pageType === 'about' ? state.settings.general?.about : state.settings.general?.privacy;
+            
+            return `
+                <div class="max-w-3xl mx-auto bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm min-h-[60vh] animate-fade-in">
+                    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-6 pb-4 border-b border-gray-100">${title}</h1>
+                    <div class="text-gray-600 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">${content || 'Content not updated yet. Please check back later.'}</div>
+                </div>
+            `;
+        };
+
+        // Actions
         window.loginWithGoogle = async () => {
-            const provider = new GoogleAuthProvider();
             try {
-                await signInWithPopup(auth, provider);
+                await signInWithPopup(auth, new GoogleAuthProvider());
                 showToast("Successfully signed in!");
-            } catch (error) {
-                console.error("Login Error:", error);
-                showToast(error.message, "error");
-            }
+            } catch (error) { showToast(error.message, "error"); }
         };
 
         window.logout = async () => {
             try {
                 await signOut(auth);
-                await signInAnonymously(auth); // Fallback to guest mode
-                state.profile = null;
-                state.orders = [];
+                await signInAnonymously(auth);
+                state.profile = null; state.orders = [];
                 showToast("Signed out.");
                 navigate('home');
-            } catch (error) {
-                console.error("Logout Error:", error);
-            }
+            } catch (error) { console.error(error); }
         };
 
         window.saveProfile = async (e) => {
@@ -694,33 +784,21 @@
                 address: document.getElementById('prof-address').value,
                 updatedAt: serverTimestamp()
             };
-
             try {
                 await setDoc(doc(db, 'artifacts', APP_ID, 'users', state.user.uid, 'profile', 'info'), data, {merge: true});
                 state.profile = { ...state.profile, ...data };
-                showToast("Profile saved!");
-            } catch (error) {
-                console.error("Save profile error:", error);
-                showToast("Failed to save profile", "error");
-            } finally {
-                btn.innerHTML = `Save Details`;
-            }
+                showToast("Profile details saved!");
+            } catch (error) { showToast("Failed to save profile", "error"); } 
+            finally { btn.innerHTML = `Save Details`; }
         };
 
         window.cancelOrder = async (orderId) => {
             if(!confirm("Are you sure you want to cancel this order?")) return;
             try {
-                // Rule complies: status to Cancelled, previous Pending, time limit checked by rule
-                await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'orders', orderId), {
-                    status: "Cancelled"
-                });
-                showToast("Order cancelled successfully.");
-                await fetchUserData(); // Refresh local list
-                renderApp();
-            } catch (error) {
-                console.error("Cancel order error:", error);
-                showToast("Could not cancel order (might be processing or expired).", "error");
-            }
+                await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'orders', orderId), { status: "Cancelled" });
+                showToast("Order cancelled.");
+                await fetchUserData(); renderApp();
+            } catch (error) { showToast("Could not cancel order.", "error"); }
         };
 
         const renderApp = () => {
@@ -728,19 +806,21 @@
             container.style.opacity = '0';
             
             setTimeout(() => {
-                let contentHTML = '';
-                if (state.currentTab === 'home') contentHTML = renderHome();
-                else if (state.currentTab === 'categories') contentHTML = renderCategories();
-                else if (state.currentTab === 'cart') contentHTML = renderCart();
-                else if (state.currentTab === 'profile') contentHTML = renderProfile();
+                let html = '';
+                if (state.currentTab === 'home') html = renderHome();
+                else if (state.currentTab === 'categories') html = renderCategories();
+                else if (state.currentTab === 'cart') html = renderCart();
+                else if (state.currentTab === 'profile') html = renderProfile();
+                else if (state.currentTab === 'product') html = renderProductDetails();
+                else if (state.currentTab === 'page') html = renderPage();
                 
-                container.innerHTML = contentHTML;
+                container.innerHTML = html;
                 lucide.createIcons();
                 container.style.opacity = '1';
             }, 150);
         };
 
-        // Event Listeners for Search
+        // Search Listeners
         const handleSearch = (e) => {
             state.searchQuery = e.target.value;
             if(state.currentTab !== 'home') navigate('home');
@@ -749,30 +829,22 @@
         document.getElementById('searchInputDesk').addEventListener('input', handleSearch);
         document.getElementById('searchInputMob').addEventListener('input', handleSearch);
 
-        // Initialization
+        // Init
         const init = async () => {
-            injectPWA();
             updateCartBadge();
-            
-            // Core logic (Rule 3: Auth first)
+            // Fetch public data FIRST so users see products instantly without waiting for Auth
+            await fetchPublicData(); 
+
             onAuthStateChanged(auth, async (user) => {
                 state.user = user;
                 if (!user) {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (e) {
-                        console.error("Anon auth failed:", e);
-                    }
+                    signInAnonymously(auth).catch(e => console.error("Anon auth failed:", e));
                 } else {
-                    // Fetch data once authenticated (even anonymously)
-                    await fetchPublicData();
-                    if (!user.isAnonymous) {
-                        await fetchUserData();
-                    }
-                    renderApp(); // Initial render
-                    navigate('home');
+                    if (!user.isAnonymous) await fetchUserData();
+                    if(state.currentTab === 'profile') renderApp(); // Rerender if on profile
                 }
             });
+            navigate('home');
         };
 
         window.onload = init;
