@@ -5,38 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MiShop | Premium Online Shopping BD</title>
     
-    <!-- PWA Manifest Link -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- Dynamic Manifest Link for PWA -->
+    <link id="manifest-link" rel="manifest">
     <meta name="theme-color" content="#10B981" id="meta-theme-color">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="MiShop - Premium Online Shopping BD">
-    <meta property="og:description" content="Discover premium products at unbeatable prices. Fast delivery across Bangladesh.">
+    <meta property="og:description" content="Discover premium products at unbeatable prices.">
     <meta property="og:image" content="https://mishopbd.vercel.app/mishopthamnale.jpg">
     <meta property="og:url" content="https://mishopbd.vercel.app">
-    <meta property="og:type" content="website">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { dark: '#111827' }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { dark: '#111827' } } } }
     </script>
     <style>
-        /* Dynamic Theme CSS Variables */
-        :root {
-            --theme-color: #10B981;
-            --theme-color-light: #d1fae5;
-        }
-        
+        :root { --theme-color: #10B981; --theme-color-light: #d1fae5; }
         .bg-theme { background-color: var(--theme-color) !important; color: white !important; }
         .text-theme { color: var(--theme-color) !important; }
         .border-theme { border-color: var(--theme-color) !important; }
@@ -45,8 +32,7 @@
         .bg-theme-light { background-color: var(--theme-color-light) !important; color: var(--theme-color) !important; }
 
         ::-webkit-scrollbar { display: none; }
-        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid #f3f4f6; }
-        .hide { display: none !important; }
+        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #f3f4f6; }
         .slider-img { scroll-snap-align: center; flex: 0 0 100%; object-fit: contain; background: #f9fafb; }
         .slider-container { scroll-snap-type: x mandatory; overflow-x: auto; display: flex; scrollbar-width: none; }
     </style>
@@ -62,18 +48,16 @@
         <button onclick="installApp()" class="bg-theme px-4 py-1.5 rounded-full font-bold active:scale-95 text-xs shadow-sm">Install</button>
     </div>
 
-    <!-- Sticky Header -->
+    <!-- Header -->
     <header class="fixed top-0 w-full z-50 glass-header px-4 py-2 shadow-sm transition-all" id="main-header">
         <div class="flex items-center justify-between w-full max-w-7xl mx-auto h-12">
-            <button id="back-btn" onclick="goBack()" class="hidden mr-3 p-2 bg-gray-100 rounded-full active:scale-95 text-gray-700 hover:bg-gray-200 transition-colors">
+            <button id="back-btn" onclick="goBack()" class="hidden mr-3 p-2 bg-gray-100 rounded-full active:scale-95 text-gray-700">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </button>
-            
             <div class="flex items-center gap-2 cursor-pointer shrink-0" onclick="navigate('home')">
-                <img src="https://mishopbd.vercel.app/mishoplogo.jpg" alt="Logo" class="h-9 w-9 rounded-full shadow-sm object-cover border border-gray-100">
+                <img src="https://mishopbd.vercel.app/mishoplogo.jpg" class="h-9 w-9 rounded-full shadow-sm object-cover border border-gray-100">
                 <h1 class="text-xl font-black tracking-tight text-dark">Mi<span class="text-theme">Shop</span></h1>
             </div>
-
             <div class="relative flex-1 max-w-xs ml-auto hidden sm:block" id="desktop-search">
                 <input type="text" id="searchInputDesk" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 border border-transparent ring-theme outline-none transition-all text-sm">
                 <i data-lucide="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400"></i>
@@ -81,7 +65,7 @@
         </div>
     </header>
 
-    <!-- Mobile Search Bar (Compact Design) -->
+    <!-- Mobile Search Bar -->
     <div class="pt-16 px-4 sm:hidden w-full transition-all" id="mobile-search-container">
         <div class="relative w-full">
             <input type="text" id="searchInputMob" placeholder="Search products or categories..." class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white shadow-sm border border-gray-100 ring-theme outline-none transition-all text-sm">
@@ -89,46 +73,24 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <main id="app-content" class="min-h-screen pt-4 sm:pt-20 px-4 max-w-7xl mx-auto transition-opacity duration-300 mb-6">
         <div class="flex flex-col items-center justify-center h-[60vh]">
             <i data-lucide="loader-2" class="h-10 w-10 text-theme animate-spin"></i>
-            <p class="mt-4 text-gray-500 font-medium">Loading MiShop...</p>
         </div>
     </main>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Nav -->
     <nav id="bottom-nav" class="fixed bottom-0 w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 px-6 py-1.5 pb-safe transition-transform duration-300">
         <ul class="flex justify-between items-center max-w-md mx-auto">
-            <li>
-                <button onclick="navigate('home')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="home">
-                    <i data-lucide="home" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-bold">Home</span>
-                </button>
-            </li>
-            <li>
-                <button onclick="navigate('categories')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="categories">
-                    <i data-lucide="layout-grid" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-bold">Category</span>
-                </button>
-            </li>
-            <li class="relative">
-                <button onclick="navigate('cart')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="cart">
-                    <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-bold">Cart</span>
-                    <span id="cart-badge" class="absolute top-1 right-2 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full shadow-sm hidden border border-white">0</span>
-                </button>
-            </li>
-            <li>
-                <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="profile">
-                    <i data-lucide="user" class="h-6 w-6"></i>
-                    <span class="text-[10px] mt-1 font-bold">Profile</span>
-                </button>
-            </li>
+            <li><button onclick="navigate('home')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="home"><i data-lucide="home" class="h-6 w-6"></i><span class="text-[10px] mt-1 font-bold">Home</span></button></li>
+            <li><button onclick="navigate('categories')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="categories"><i data-lucide="layout-grid" class="h-6 w-6"></i><span class="text-[10px] mt-1 font-bold">Category</span></button></li>
+            <li class="relative"><button onclick="navigate('cart')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="cart"><i data-lucide="shopping-bag" class="h-6 w-6"></i><span class="text-[10px] mt-1 font-bold">Cart</span><span id="cart-badge" class="absolute top-1 right-2 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full hidden border border-white">0</span></button></li>
+            <li><button onclick="navigate('profile')" class="nav-btn flex flex-col items-center p-2 px-4 transition-all active:scale-95 text-gray-400" data-tab="profile"><i data-lucide="user" class="h-6 w-6"></i><span class="text-[10px] mt-1 font-bold">Profile</span></button></li>
         </ul>
     </nav>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast -->
     <div id="toast-container" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none w-11/12 max-w-sm"></div>
 
     <script type="module">
@@ -137,34 +99,37 @@
         import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, increment, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDx6oI0OStR52vYJgIy86m60WROz29bqEo",
-            authDomain: "mi-shop-online-shopping-bd.firebaseapp.com",
-            projectId: "mi-shop-online-shopping-bd",
-            storageBucket: "mi-shop-online-shopping-bd.firebasestorage.app",
-            messagingSenderId: "872730639611",
-            appId: "1:872730639611:web:7ff5078075865ca437045e",
-            measurementId: "G-EJ0E4P5RQR"
+            apiKey: "AIzaSyDx6oI0OStR52vYJgIy86m60WROz29bqEo", authDomain: "mi-shop-online-shopping-bd.firebaseapp.com",
+            projectId: "mi-shop-online-shopping-bd", storageBucket: "mi-shop-online-shopping-bd.firebasestorage.app",
+            messagingSenderId: "872730639611", appId: "1:872730639611:web:7ff5078075865ca437045e", measurementId: "G-EJ0E4P5RQR"
         };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         const APP_ID = "mi-shop-online-shopping-bd";
 
-        const state = {
-            user: null, profile: null, products: [], categories: [], orders: [], settings: {},
-            cart: JSON.parse(localStorage.getItem('mishop_cart')) || [],
-            currentTab: 'home', previousTab: 'home', currentProduct: null, searchQuery: ''
-        };
+        const state = { user: null, profile: null, products: [], categories: [], orders: [], settings: {}, cart: JSON.parse(localStorage.getItem('mishop_cart')) || [], currentTab: 'home', previousTab: 'home', currentProduct: null, searchQuery: '' };
 
-        // PWA Install Logic (Correct implementation)
+        // === PWA LOGIC (Dynamic Service Worker & Manifest) ===
+        const initPWA = () => {
+            const manifest = {
+                name: "MiShop BD", short_name: "MiShop", display: "standalone", start_url: ".",
+                background_color: "#ffffff", theme_color: "#10B981",
+                icons: [{src: "https://mishopbd.vercel.app/mishoplogo.jpg", sizes: "192x192", type: "image/jpeg"},
+                        {src: "https://mishopbd.vercel.app/mishoplogo.jpg", sizes: "512x512", type: "image/jpeg"}]
+            };
+            document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
+
+            const swCode = `self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => self.clients.claim()); self.addEventListener('fetch', e => {});`;
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode], {type: 'application/javascript'}))).catch(err => console.log(err));
+            }
+        };
+        initPWA();
+
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+            e.preventDefault(); deferredPrompt = e;
             document.getElementById('install-banner').classList.remove('hidden');
-            document.getElementById('main-header').classList.remove('fixed', 'top-0');
-            document.getElementById('main-header').classList.add('sticky', 'top-0');
+            document.getElementById('main-header').classList.replace('fixed', 'sticky');
         });
 
         window.installApp = async () => {
@@ -173,386 +138,210 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     document.getElementById('install-banner').classList.add('hidden');
-                    document.getElementById('main-header').classList.remove('sticky');
-                    document.getElementById('main-header').classList.add('fixed');
+                    document.getElementById('main-header').classList.replace('sticky', 'fixed');
                 }
                 deferredPrompt = null;
-            } else {
-                showToast("Your browser doesn't support direct install. Use the 'Add to Home Screen' menu option.", "info");
-            }
+            } else showToast("Use your browser menu to 'Add to Home Screen'");
         };
 
-        // Apply Dynamic Theme
         const applyThemeColor = (color) => {
-            if(color) {
-                document.documentElement.style.setProperty('--theme-color', color);
-                document.getElementById('meta-theme-color').content = color;
-            }
+            if(color) { document.documentElement.style.setProperty('--theme-color', color); document.getElementById('meta-theme-color').content = color; }
         };
 
-        // UI Helpers
-        window.showToast = (message, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colorClass = type === 'success' ? 'bg-theme' : type === 'error' ? 'bg-red-500' : 'bg-dark';
-            toast.className = `${colorClass} text-white px-5 py-3 rounded-2xl shadow-xl font-bold text-sm transition-all transform scale-95 opacity-0 flex items-center gap-3`;
-            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 shrink-0"></i> <span>${message}</span>`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            
-            requestAnimationFrame(() => toast.classList.remove('scale-95', 'opacity-0'));
-            setTimeout(() => {
-                toast.classList.add('opacity-0', '-translate-y-4');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+        window.showToast = (msg, type = 'success') => {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `${type === 'success' ? 'bg-theme' : 'bg-red-500'} text-white px-5 py-3 rounded-2xl shadow-xl font-bold text-sm transition-all transform scale-95 opacity-0 flex items-center gap-3`;
+            t.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 shrink-0"></i> <span>${msg}</span>`;
+            c.appendChild(t); lucide.createIcons(); requestAnimationFrame(() => t.classList.remove('scale-95', 'opacity-0'));
+            setTimeout(() => { t.classList.add('opacity-0', '-translate-y-4'); setTimeout(() => t.remove(), 300); }, 3000);
         };
 
         window.navigate = (tab, payload = null) => {
             if(state.currentTab !== tab) state.previousTab = state.currentTab;
             state.currentTab = tab;
             
-            const validTabs = ['home', 'categories', 'cart', 'profile'];
-            if(validTabs.includes(tab)) {
+            if(['home', 'categories', 'cart', 'profile'].includes(tab)) {
                 document.querySelectorAll('.nav-btn').forEach(btn => {
-                    if(btn.dataset.tab === tab) {
-                        btn.classList.add('nav-active');
-                        btn.classList.remove('text-gray-400');
-                    } else {
-                        btn.classList.remove('nav-active');
-                        btn.classList.add('text-gray-400');
-                    }
+                    if(btn.dataset.tab === tab) { btn.classList.add('nav-active'); btn.classList.remove('text-gray-400'); }
+                    else { btn.classList.remove('nav-active'); btn.classList.add('text-gray-400'); }
                 });
             }
 
-            const searchMob = document.getElementById('mobile-search-container');
-            const searchDesk = document.getElementById('desktop-search');
-            const backBtn = document.getElementById('back-btn');
-            const bottomNav = document.getElementById('bottom-nav');
+            const searchMob = document.getElementById('mobile-search-container'); const searchDesk = document.getElementById('desktop-search');
+            const backBtn = document.getElementById('back-btn'); const bottomNav = document.getElementById('bottom-nav');
             const appContent = document.getElementById('app-content');
 
             if (tab === 'home' || tab === 'categories') {
-                searchMob.classList.remove('hidden');
-                searchDesk.classList.remove('opacity-0', 'pointer-events-none');
-                backBtn.classList.add('hidden');
-                bottomNav.style.transform = 'translateY(0)';
-                appContent.classList.remove('pt-20');
+                searchMob.classList.remove('hidden'); searchDesk.classList.remove('opacity-0', 'pointer-events-none');
+                backBtn.classList.add('hidden'); bottomNav.style.transform = 'translateY(0)'; appContent.classList.remove('pt-20');
             } else if (tab === 'product' || tab === 'page') {
-                searchMob.classList.add('hidden');
-                searchDesk.classList.add('opacity-0', 'pointer-events-none');
-                backBtn.classList.remove('hidden');
-                bottomNav.style.transform = 'translateY(100%)';
-                appContent.classList.add('pt-20');
+                searchMob.classList.add('hidden'); searchDesk.classList.add('opacity-0', 'pointer-events-none');
+                backBtn.classList.remove('hidden'); bottomNav.style.transform = 'translateY(100%)'; appContent.classList.add('pt-20');
             } else {
-                searchMob.classList.add('hidden');
-                searchDesk.classList.add('opacity-0', 'pointer-events-none');
-                backBtn.classList.add('hidden');
-                bottomNav.style.transform = 'translateY(0)';
-                appContent.classList.add('pt-20');
+                searchMob.classList.add('hidden'); searchDesk.classList.add('opacity-0', 'pointer-events-none');
+                backBtn.classList.add('hidden'); bottomNav.style.transform = 'translateY(0)'; appContent.classList.add('pt-20');
             }
             
-            if(tab === 'product' && payload) state.currentProduct = payload;
-            
-            renderApp();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(payload) state.currentProduct = payload;
+            renderApp(); window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-
         window.goBack = () => navigate(state.previousTab !== 'product' ? state.previousTab : 'home');
 
         const updateCartBadge = () => {
-            const badge = document.getElementById('cart-badge');
-            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-            if (count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } 
-            else { badge.classList.add('hidden'); }
+            const badge = document.getElementById('cart-badge'); const count = state.cart.reduce((s, i) => s + i.quantity, 0);
+            if (count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden');
             localStorage.setItem('mishop_cart', JSON.stringify(state.cart));
         };
 
-        window.addToCart = (productId) => {
-            const product = state.products.find(p => p.id === productId);
-            if (!product) return;
-            
+        window.addToCart = (id) => {
+            const product = state.products.find(p => p.id === id); if (!product) return;
             const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
-            const existing = state.cart.find(i => i.id === productId);
-            
-            if (existing && existing.quantity >= stock) {
-                showToast("Out of stock!", "error"); return;
-            }
-            if (stock <= 0) { showToast("Product is out of stock.", "error"); return; }
-
-            if (existing) existing.quantity++;
-            else state.cart.push({ ...product, quantity: 1 });
-            
-            updateCartBadge();
-            showToast(`${product.name} added to cart!`);
+            const existing = state.cart.find(i => i.id === id);
+            if (existing && existing.quantity >= stock) { showToast("Out of stock!", "error"); return; }
+            if (stock <= 0) { showToast("Out of stock.", "error"); return; }
+            if (existing) existing.quantity++; else state.cart.push({ ...product, quantity: 1 });
+            updateCartBadge(); showToast(`${product.name} added to cart!`);
             if(state.currentTab === 'cart' || state.currentTab === 'product') renderApp();
         };
 
-        window.updateCartQty = (productId, delta) => {
-            const index = state.cart.findIndex(i => i.id === productId);
-            if (index > -1) {
-                const product = state.products.find(p => p.id === productId);
-                const stock = product?.stock !== undefined ? parseInt(product.stock) : 999;
-                const newQty = state.cart[index].quantity + delta;
-                
+        window.updateCartQty = (id, delta) => {
+            const idx = state.cart.findIndex(i => i.id === id);
+            if (idx > -1) {
+                const stock = state.products.find(p => p.id === id)?.stock ?? 999;
+                const newQty = state.cart[idx].quantity + delta;
                 if(newQty > stock) { showToast("Not enough stock.", "error"); return; }
-                
-                state.cart[index].quantity = newQty;
-                if (state.cart[index].quantity <= 0) state.cart.splice(index, 1);
+                state.cart[idx].quantity = newQty; if (state.cart[idx].quantity <= 0) state.cart.splice(idx, 1);
                 updateCartBadge(); renderApp();
             }
         };
 
         const fetchPublicData = async () => {
             try {
-                const [catSnap, prodSnap, setSnap] = await Promise.all([
-                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'categories')),
-                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'products')),
-                    getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'siteSettings'))
-                ]);
-                
-                state.categories = catSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                state.products = prodSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                setSnap.docs.forEach(doc => { state.settings[doc.id] = doc.data(); });
-                
+                const [cSnap, pSnap, sSnap] = await Promise.all([getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'categories')), getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'products')), getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'siteSettings'))]);
+                state.categories = cSnap.docs.map(d => ({id: d.id, ...d.data()})); state.products = pSnap.docs.map(d => ({id: d.id, ...d.data()}));
+                sSnap.docs.forEach(d => { state.settings[d.id] = d.data(); });
                 if(state.settings.general?.themeColor) applyThemeColor(state.settings.general.themeColor);
-                
                 renderApp();
-            } catch (error) { showToast("Failed to load products. Check internet.", "error"); }
+            } catch (error) { showToast("Network Error", "error"); }
         };
 
         const fetchUserData = async () => {
             if (!state.user || state.user.isAnonymous) return;
             try {
-                const profileDoc = await getDoc(doc(db, 'artifacts', APP_ID, 'users', state.user.uid, 'profile', 'info'));
-                if (profileDoc.exists()) state.profile = profileDoc.data();
-                
-                const ordersSnap = await getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'));
-                state.orders = ordersSnap.docs
-                    .map(doc => ({id: doc.id, ...doc.data()}))
-                    .filter(o => o.userId === state.user.uid)
-                    .sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds);
-            } catch (e) { console.error("User data fetch error:", e); }
+                const pDoc = await getDoc(doc(db, 'artifacts', APP_ID, 'users', state.user.uid, 'profile', 'info'));
+                if (pDoc.exists()) state.profile = pDoc.data();
+                const oSnap = await getDocs(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'));
+                state.orders = oSnap.docs.map(d => ({id: d.id, ...d.data()})).filter(o => o.userId === state.user.uid).sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds);
+            } catch (e) {}
         };
 
-        // UI Components
-        const renderProductCard = (product) => {
-            const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
-            const isOutOfStock = stock <= 0;
-            
+        const renderProductCard = (p) => {
+            const stock = p.stock !== undefined ? parseInt(p.stock) : 999;
             return `
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group flex flex-col relative" onclick="navigate('product', '${product.id}')">
-                <div class="relative h-48 w-full overflow-hidden bg-gray-100 shrink-0">
-                    <img src="${product.imageUrl || 'https://via.placeholder.com/400'}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
-                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold text-gray-700 shadow-sm">
-                        <i data-lucide="eye" class="w-3 h-3 text-theme"></i> ${product.views || 0}
-                    </div>
-                    ${product.oldPrice ? `<div class="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-[10px] font-black tracking-wide shadow">SALE</div>` : ''}
-                    ${isOutOfStock ? `<div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center"><span class="bg-dark text-white font-bold px-3 py-1 rounded text-xs uppercase shadow-lg">Out of Stock</span></div>` : ''}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer flex flex-col relative" onclick="navigate('product', '${p.id}')">
+                <div class="relative h-48 w-full bg-gray-100 shrink-0">
+                    <img src="${p.imageUrl}" class="w-full h-full object-cover" loading="lazy">
+                    <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold shadow-sm"><i data-lucide="eye" class="w-3 h-3 text-theme"></i> ${p.views || 0}</div>
+                    ${p.oldPrice ? `<div class="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-[10px] font-black shadow">SALE</div>` : ''}
+                    ${stock <= 0 ? `<div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center"><span class="bg-dark text-white font-bold px-3 py-1 rounded text-xs uppercase shadow-lg">Stock Out</span></div>` : ''}
                 </div>
                 <div class="p-3 flex flex-col flex-1">
-                    ${product.subCategory ? `<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">${product.subCategory}</span>` : ''}
-                    <h3 class="font-bold text-gray-900 text-sm line-clamp-2 leading-tight mb-2">${product.name}</h3>
+                    ${p.subCategory ? `<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">${p.subCategory}</span>` : ''}
+                    <h3 class="font-bold text-gray-900 text-sm line-clamp-2 leading-tight mb-2">${p.name}</h3>
                     <div class="mt-auto flex justify-between items-end">
-                        <div>
-                            <p class="text-theme font-black text-lg flex items-center leading-none">৳${product.currentPrice}</p>
-                            ${product.oldPrice ? `<p class="text-gray-400 text-xs line-through mt-0.5">৳${product.oldPrice}</p>` : ''}
-                        </div>
-                        <button onclick="event.stopPropagation(); addToCart('${product.id}')" class="${isOutOfStock ? 'bg-gray-200 text-gray-400' : 'bg-dark text-white hover:bg-theme'} p-2 rounded-xl active:scale-95 transition-all shadow-sm">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </button>
+                        <div><p class="text-theme font-black text-lg leading-none">৳${p.currentPrice}</p>${p.oldPrice ? `<p class="text-gray-400 text-xs line-through mt-0.5">৳${p.oldPrice}</p>` : ''}</div>
+                        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="${stock <= 0 ? 'bg-gray-200 text-gray-400' : 'bg-dark text-white hover:bg-theme'} p-2 rounded-xl active:scale-95 shadow-sm"><i data-lucide="plus" class="w-5 h-5"></i></button>
                     </div>
                 </div>
-            </div>
-            `;
+            </div>`;
         };
 
         const renderHome = () => {
-            let displayProducts = state.products;
+            let filtered = state.products;
             if (state.searchQuery) {
                 const q = state.searchQuery.toLowerCase();
-                displayProducts = displayProducts.filter(p => p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q)) || (p.subCategory && p.subCategory.toLowerCase().includes(q)));
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q)) || (p.subCategory && p.subCategory.toLowerCase().includes(q)));
             }
-
             return `
-                <div class="mb-4 pt-2">
-                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Trending Now</h2>
-                    <p class="text-sm text-gray-500 mt-1">Discover our most popular picks.</p>
-                </div>
-                ${displayProducts.length > 0 ? `
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                    ${displayProducts.map(p => renderProductCard(p)).join('')}
-                </div>` : `
-                <div class="text-center py-20 text-gray-400">
-                    <i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                    <p class="font-bold text-lg text-gray-600">No products found.</p>
-                </div>`}
+                <div class="mb-4 pt-2"><h2 class="text-2xl font-black text-gray-900">Trending Now</h2><p class="text-sm text-gray-500 mt-1">Discover popular picks.</p></div>
+                ${filtered.length > 0 ? `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">${filtered.map(p => renderProductCard(p)).join('')}</div>` : `<div class="text-center py-20 text-gray-400"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p class="font-bold text-lg text-gray-600">No products found.</p></div>`}
             `;
         };
 
         const renderCategories = () => `
-            <div class="mb-6 pt-2">
-                <h2 class="text-2xl font-black text-gray-900 tracking-tight">Browse Categories</h2>
-            </div>
+            <div class="mb-6 pt-2"><h2 class="text-2xl font-black text-gray-900">Categories</h2></div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                ${state.categories.length > 0 ? state.categories.map(c => `
-                    <div onclick="setSearch('${c.name}')" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 cursor-pointer active:scale-95 transition-all border-theme hover:shadow-md">
-                        <div class="bg-theme-light p-4 rounded-full">
-                            <i data-lucide="${c.iconId || 'box'}" class="w-8 h-8 text-theme"></i>
-                        </div>
-                        <span class="font-bold text-gray-800 text-center text-sm">${c.name}</span>
-                    </div>
-                `).join('') : '<p class="text-gray-500 col-span-2 text-center py-10">No categories found.</p>'}
+                ${state.categories.length > 0 ? state.categories.map(c => `<div onclick="setSearch('${c.name}')" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 cursor-pointer active:scale-95 border-theme hover:shadow-md"><div class="bg-theme-light p-4 rounded-full"><i data-lucide="${c.iconId || 'box'}" class="w-8 h-8 text-theme"></i></div><span class="font-bold text-gray-800 text-sm">${c.name}</span></div>`).join('') : '<p class="text-gray-500 col-span-2 text-center py-10">No categories.</p>'}
             </div>
         `;
 
-        // FIXED: Product details image uses object-contain to show full image
+        window.setSearch = (t) => { document.getElementById('searchInputDesk').value = t; document.getElementById('searchInputMob').value = t; state.searchQuery = t; navigate('home'); };
+
         const renderProductDetails = () => {
-            const product = state.products.find(p => p.id === state.currentProduct);
-            if(!product) return `<p class="text-center py-10">Product not found.</p>`;
-
-            if(!product.viewedThisSession) {
-                product.views = (product.views || 0) + 1;
-                product.viewedThisSession = true;
-                updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'products', product.id), { views: increment(1) }).catch(e=>e);
-            }
-
-            const stock = product.stock !== undefined ? parseInt(product.stock) : 999;
-            const isOutOfStock = stock <= 0;
-            let images = product.additionalImages ? product.additionalImages.split(',').map(s => s.trim()).filter(s => s) : [];
-            images.unshift(product.imageUrl);
-
-            const related = state.products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+            const p = state.products.find(x => x.id === state.currentProduct); if(!p) return `<p class="text-center py-10">Not found.</p>`;
+            if(!p.viewedThisSession) { p.views = (p.views || 0) + 1; p.viewedThisSession = true; updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'products', p.id), { views: increment(1) }).catch(e=>e); }
+            const stock = p.stock !== undefined ? parseInt(p.stock) : 999;
+            let images = p.additionalImages ? p.additionalImages.split(',').map(s => s.trim()).filter(s => s) : []; images.unshift(p.imageUrl);
+            const related = state.products.filter(x => x.category === p.category && x.id !== p.id).slice(0, 4);
 
             return `
                 <div class="pb-24 pt-2 animate-fade-in max-w-2xl mx-auto">
                     <div class="relative w-full h-[55vh] bg-gray-100 rounded-3xl overflow-hidden mb-6 shadow-inner border border-gray-200">
-                        <div class="slider-container h-full w-full">
-                            ${images.map(img => `<img src="${img}" class="slider-img">`).join('')}
-                        </div>
+                        <div class="slider-container h-full w-full">${images.map(img => `<img src="${img}" class="slider-img">`).join('')}</div>
                         ${images.length > 1 ? `<div class="absolute bottom-3 right-3 bg-dark/70 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur"><i data-lucide="images" class="w-3 h-3"></i> Swipe</div>` : ''}
                     </div>
-                    
                     <div class="px-2">
                         <div class="flex justify-between items-start mb-2">
-                            <div>
-                                ${product.subCategory ? `<p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">${product.subCategory}</p>` : ''}
-                                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">${product.name}</h1>
-                            </div>
-                            <span class="flex items-center gap-1 text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full shrink-0">
-                                <i data-lucide="eye" class="w-4 h-4"></i> ${product.views}
-                            </span>
+                            <div>${p.subCategory ? `<p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">${p.subCategory}</p>` : ''}<h1 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">${p.name}</h1></div>
+                            <span class="flex items-center gap-1 text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full shrink-0"><i data-lucide="eye" class="w-4 h-4"></i> ${p.views}</span>
                         </div>
-                        
-                        <div class="flex items-center gap-4 mb-6">
-                            <span class="text-theme font-black text-3xl">৳${product.currentPrice}</span>
-                            ${product.oldPrice ? `<span class="text-gray-400 line-through text-lg font-medium">৳${product.oldPrice}</span>` : ''}
-                        </div>
-
-                        ${product.sizes ? `
-                        <div class="mb-6">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Available Sizes</p>
-                            <div class="flex gap-2 flex-wrap">
-                                ${product.sizes.split(',').map(s => `<span class="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-sm font-bold text-gray-700 shadow-sm">${s.trim()}</span>`).join('')}
-                            </div>
-                        </div>` : ''}
-
-                        <div class="mb-8 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Product Description</p>
-                            <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">${product.description || 'No description available.'}</p>
-                        </div>
-
-                        ${product.youtubeLink ? `
-                        <a href="${product.youtubeLink}" target="_blank" class="w-full mb-6 flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3.5 rounded-2xl font-bold active:scale-95 transition-all">
-                            <i data-lucide="youtube" class="w-5 h-5"></i> Watch Video Review
-                        </a>` : ''}
-
-                        ${related.length > 0 ? `
-                        <div class="mt-8 border-t border-gray-200 pt-6">
-                            <h3 class="text-lg font-black text-gray-900 mb-4">You May Also Like</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                ${related.map(p => renderProductCard(p)).join('')}
-                            </div>
-                        </div>` : ''}
+                        <div class="flex items-center gap-4 mb-6"><span class="text-theme font-black text-3xl">৳${p.currentPrice}</span>${p.oldPrice ? `<span class="text-gray-400 line-through text-lg font-medium">৳${p.oldPrice}</span>` : ''}</div>
+                        ${p.sizes ? `<div class="mb-6"><p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Sizes</p><div class="flex gap-2 flex-wrap">${p.sizes.split(',').map(s => `<span class="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-sm font-bold text-gray-700">${s.trim()}</span>`).join('')}</div></div>` : ''}
+                        <div class="mb-8 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm"><p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Description</p><p class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">${p.description || 'No description available.'}</p></div>
+                        ${p.youtubeLink ? `<a href="${p.youtubeLink}" target="_blank" class="w-full mb-6 flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3.5 rounded-2xl font-bold active:scale-95"><i data-lucide="youtube" class="w-5 h-5"></i> Watch Video</a>` : ''}
+                        ${related.length > 0 ? `<div class="mt-8 border-t border-gray-200 pt-6"><h3 class="text-lg font-black text-gray-900 mb-4">You May Also Like</h3><div class="grid grid-cols-2 gap-3">${related.map(r => renderProductCard(r)).join('')}</div></div>` : ''}
                     </div>
-
                     <div class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-gray-200 p-4 pb-safe z-50">
-                        <div class="max-w-2xl mx-auto">
-                            <button onclick="addToCart('${product.id}')" class="w-full ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-theme text-white active:scale-95 shadow-lg'} py-4 rounded-2xl font-black text-lg transition-all flex justify-center items-center gap-2">
-                                ${isOutOfStock ? 'Out of Stock' : `<i data-lucide="shopping-bag" class="w-5 h-5"></i> Add to Cart - ৳${product.currentPrice}`}
-                            </button>
-                        </div>
+                        <div class="max-w-2xl mx-auto"><button onclick="addToCart('${p.id}')" class="w-full ${stock <= 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-theme text-white active:scale-95 shadow-lg'} py-4 rounded-2xl font-black text-lg flex justify-center items-center gap-2">${stock <= 0 ? 'Out of Stock' : `<i data-lucide="shopping-bag" class="w-5 h-5"></i> Add to Cart - ৳${p.currentPrice}`}</button></div>
                     </div>
-                </div>
-            `;
+                </div>`;
         };
 
         const renderCart = () => {
-            const subtotal = state.cart.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
-            if (state.cart.length === 0) {
-                return `
-                    <div class="flex flex-col items-center justify-center h-[60vh] text-center">
-                        <div class="bg-theme-light p-6 rounded-full mb-6 text-theme"><i data-lucide="shopping-cart" class="w-16 h-16"></i></div>
-                        <h2 class="text-2xl font-black text-gray-900 mb-2">Your cart is empty</h2>
-                        <button onclick="navigate('home')" class="mt-6 bg-dark text-white px-8 py-3.5 rounded-xl font-bold active:scale-95">Start Shopping</button>
-                    </div>
-                `;
-            }
+            const sub = state.cart.reduce((s, i) => s + (i.currentPrice * i.quantity), 0);
+            if (state.cart.length === 0) return `<div class="flex flex-col items-center justify-center h-[60vh] text-center"><div class="bg-theme-light p-6 rounded-full mb-6 text-theme"><i data-lucide="shopping-cart" class="w-16 h-16"></i></div><h2 class="text-2xl font-black text-gray-900 mb-2">Cart is empty</h2><button onclick="navigate('home')" class="mt-6 bg-dark text-white px-8 py-3.5 rounded-xl font-bold active:scale-95">Start Shopping</button></div>`;
             return `
                 <div class="lg:flex gap-8 items-start pb-10 pt-2">
-                    <div class="flex-1 space-y-3 mb-8 lg:mb-0">
-                        <h2 class="text-2xl font-black text-gray-900 mb-4">Your Cart</h2>
-                        ${state.cart.map(item => `
-                            <div class="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
-                                <img src="${item.imageUrl}" class="w-20 h-20 object-cover rounded-xl bg-gray-50">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${item.name}</h4>
-                                    <p class="text-theme font-black text-lg">৳${item.currentPrice}</p>
-                                    <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 w-max mt-2">
-                                        <button onclick="updateCartQty('${item.id}', -1)" class="p-1 active:scale-95"><i data-lucide="minus" class="w-4 h-4 text-gray-600"></i></button>
-                                        <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
-                                        <button onclick="updateCartQty('${item.id}', 1)" class="p-1 active:scale-95"><i data-lucide="plus" class="w-4 h-4 text-gray-600"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="w-full lg:w-96 bg-white p-6 rounded-3xl shadow-md border border-gray-100 lg:sticky lg:top-24">
-                        <h3 class="text-lg font-black text-gray-900 mb-4">Order Summary</h3>
-                        <div class="flex justify-between mb-4 text-xl font-black text-gray-900 border-b border-gray-100 pb-4">
-                            <span>Total</span><span class="text-theme">৳${subtotal}</span>
-                        </div>
-                        <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-4">
+                    <div class="flex-1 space-y-3 mb-8 lg:mb-0"><h2 class="text-2xl font-black text-gray-900 mb-4">Your Cart</h2>${state.cart.map(i => `<div class="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100"><img src="${i.imageUrl}" class="w-20 h-20 object-cover rounded-xl bg-gray-50"><div class="flex-1"><h4 class="font-bold text-gray-900 text-sm line-clamp-1">${i.name}</h4><p class="text-theme font-black text-lg">৳${i.currentPrice}</p><div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 w-max mt-2"><button onclick="updateCartQty('${i.id}', -1)" class="p-1 active:scale-95"><i data-lucide="minus" class="w-4 h-4 text-gray-600"></i></button><span class="font-bold text-sm w-4 text-center">${i.quantity}</span><button onclick="updateCartQty('${i.id}', 1)" class="p-1 active:scale-95"><i data-lucide="plus" class="w-4 h-4 text-gray-600"></i></button></div></div></div>`).join('')}</div>
+                    <div class="w-full lg:w-96 bg-white p-6 rounded-3xl shadow-md border border-gray-100 lg:sticky lg:top-24"><h3 class="text-lg font-black text-gray-900 mb-4">Summary</h3><div class="flex justify-between mb-4 text-xl font-black text-gray-900 border-b border-gray-100 pb-4"><span>Total</span><span class="text-theme">৳${sub}</span></div>
+                        <form onsubmit="handleCheckout(event)" class="space-y-4">
                             <input type="text" id="co-name" placeholder="Full Name" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl ring-theme outline-none font-medium" value="${state.user?.displayName || ''}">
                             <input type="tel" id="co-phone" placeholder="Phone Number" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl ring-theme outline-none font-medium" value="${state.profile?.phone || ''}">
                             <textarea id="co-address" placeholder="Delivery Address" required class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl ring-theme outline-none resize-none h-24 font-medium">${state.profile?.address || ''}</textarea>
-                            <button type="submit" id="checkout-btn" class="w-full bg-theme text-white py-4 rounded-xl font-black text-lg active:scale-95 shadow-lg flex justify-center gap-2">Place Order Now</button>
+                            <button type="submit" id="checkout-btn" class="w-full bg-theme text-white py-4 rounded-xl font-black text-lg active:scale-95 shadow-lg flex justify-center">Place Order</button>
                         </form>
                     </div>
-                </div>
-            `;
+                </div>`;
         };
 
         window.handleCheckout = async (e) => {
             e.preventDefault();
             if(!state.user || state.user.isAnonymous) { showToast("Please log in to order.", "error"); navigate('profile'); return; }
-            const btn = document.getElementById('checkout-btn');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>`; btn.disabled = true;
-
+            const btn = document.getElementById('checkout-btn'); btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>`; btn.disabled = true;
             try {
                 await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'orders'), {
-                    userId: state.user.uid, customerName: document.getElementById('co-name').value,
-                    phone: document.getElementById('co-phone').value, address: document.getElementById('co-address').value,
-                    items: state.cart, total: state.cart.reduce((s, i) => s + (i.currentPrice * i.quantity), 0),
-                    status: "Pending", timestamp: serverTimestamp()
+                    userId: state.user.uid, customerName: document.getElementById('co-name').value, phone: document.getElementById('co-phone').value, address: document.getElementById('co-address').value,
+                    items: state.cart, total: state.cart.reduce((s, i) => s + (i.currentPrice * i.quantity), 0), status: "Pending", timestamp: serverTimestamp()
                 });
                 state.cart = []; updateCartBadge(); showToast("Order placed successfully! 🎉");
                 await fetchUserData(); navigate('profile');
-            } catch (error) { showToast("Failed to place order.", "error"); btn.innerHTML = `Place Order Now`; btn.disabled = false; }
+            } catch (error) { showToast("Failed to place order.", "error"); btn.innerHTML = `Place Order`; btn.disabled = false; }
         };
 
-        // FIXED: SVGs used for FB and WA for guaranteed rendering
+        // FIXED: Solid SVG Paths for WA and FB
         const renderProfile = () => {
-            const svgFB = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>`;
-            const svgWA = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 21c-1.566 0-3.094-.403-4.453-1.163l-.32-.18-3.328.873.887-3.245-.197-.314a8.91 8.91 0 0 1-1.378-4.81c0-4.945 4.025-8.97 8.97-8.97 2.395 0 4.646.934 6.34 2.628 1.692 1.694 2.626 3.945 2.626 6.34 0 4.946-4.026 8.97-8.97 8.97l-1.178-.129zm.013-19.98c-6.073 0-11.01 4.937-11.01 11.01 0 1.942.507 3.834 1.472 5.502L1 24l6.634-1.74a10.985 10.985 0 0 0 5.41 1.428 11.012 11.012 0 0 0 11.012-11.013 11.01 11.01 0 0 0-11.012-11.012z"/><path d="M17.1 14.364c-.276-.138-1.635-.807-1.89-9-.254-.092-.439-.138-.624.138-.184.276-.714.9-.875 1.084-.16.184-.323.207-.599.069-.276-.138-1.166-.43-2.222-1.373-.822-.734-1.376-1.64-1.537-1.916-.16-.276-.017-.425.121-.563.125-.125.276-.322.414-.483.138-.161.184-.276.276-.46.092-.184.046-.345-.023-.483-.069-.138-.624-1.505-.853-2.062-.224-.541-.453-.467-.624-.475l-.531-.008c-.184 0-.484.069-.737.345-.254.276-.968.945-.968 2.304 0 1.359.99 2.673 1.13 2.857.137.184 1.945 2.969 4.71 4.13.659.276 1.173.441 1.573.565.66.21 1.263.18 1.737.109.528-.08 1.635-.668 1.866-1.313.23-.645.23-1.198.16-1.313-.07-.115-.254-.184-.531-.322z"/></svg>`;
+            const svgFB = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
+            const svgWA = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.88-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
 
             if (!state.user || state.user.isAnonymous) {
                 return `
@@ -560,15 +349,13 @@
                         <img src="https://mishopbd.vercel.app/mishoplogo.jpg" class="w-24 h-24 rounded-full mb-6 shadow-md border border-gray-100">
                         <h2 class="text-2xl font-black text-gray-900 mb-2">Welcome to MiShop</h2>
                         <p class="text-gray-500 mb-8 text-sm px-4">Sign in with Google to manage orders and save details.</p>
-                        <button onclick="loginWithGoogle()" class="w-full bg-white border border-gray-200 shadow-sm py-3.5 px-6 rounded-xl font-bold active:scale-95 transition-all flex items-center justify-center gap-3">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google
-                        </button>
+                        <button onclick="loginWithGoogle()" class="w-full bg-white border border-gray-200 shadow-sm py-3.5 px-6 rounded-xl font-bold active:scale-95 transition-all flex items-center justify-center gap-3"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google</button>
                         <div class="mt-10 pt-6 border-t border-gray-200 w-full">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Connect with us</p>
                             <div class="flex gap-4 justify-center">
-                                <a href="https://wa.me/8801572922663" target="_blank" class="bg-green-100 p-3 rounded-full text-green-600 active:scale-95 shadow-sm">${svgWA}</a>
-                                <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="bg-blue-100 p-3 rounded-full text-blue-600 active:scale-95 shadow-sm">${svgFB}</a>
-                                <a href="https://hikmah.net/@mishopbd" target="_blank" class="bg-gray-100 p-3 rounded-full active:scale-95 shadow-sm"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-6 h-6 rounded-full object-cover"></a>
+                                <a href="https://wa.me/8801572922663" target="_blank" class="text-green-500 hover:scale-110 transition-transform">${svgWA}</a>
+                                <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="text-blue-600 hover:scale-110 transition-transform">${svgFB}</a>
+                                <a href="https://hikmah.net/@mishopbd" target="_blank" class="hover:scale-110 transition-transform"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-6 h-6 rounded-full object-cover"></a>
                             </div>
                         </div>
                     </div>`;
@@ -580,18 +367,16 @@
                         <img src="${state.user.photoURL || 'https://via.placeholder.com/100'}" class="w-20 h-20 rounded-full border-4 border-theme-light object-cover shadow-sm mb-3">
                         <h2 class="text-xl font-black text-gray-900">${state.user.displayName}</h2>
                         <p class="text-gray-500 text-sm mb-4">${state.user.email}</p>
-                        <button onclick="logout()" class="text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-bold active:scale-95 flex items-center gap-2">
-                            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-                        </button>
+                        <button onclick="logout()" class="text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-bold active:scale-95 flex items-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Sign Out</button>
                         <div class="flex gap-4 mt-6">
-                            <a href="https://wa.me/8801572922663" target="_blank" class="bg-green-100 p-2.5 rounded-full text-green-600 active:scale-95 shadow-sm">${svgWA}</a>
-                            <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="bg-blue-100 p-2.5 rounded-full text-blue-600 active:scale-95 shadow-sm">${svgFB}</a>
-                            <a href="https://hikmah.net/@mishopbd" target="_blank" class="bg-gray-100 p-2.5 rounded-full active:scale-95 shadow-sm"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-6 h-6 rounded-full object-cover"></a>
+                            <a href="https://wa.me/8801572922663" target="_blank" class="text-green-500 hover:scale-110 transition-transform">${svgWA}</a>
+                            <a href="https://www.facebook.com/profile.php?id=61591513484652" target="_blank" class="text-blue-600 hover:scale-110 transition-transform">${svgFB}</a>
+                            <a href="https://hikmah.net/@mishopbd" target="_blank" class="hover:scale-110 transition-transform"><img src="https://hikmah.b-cdn.net/12428/conversions/Avatar-thumb.jpg" class="w-6 h-6 rounded-full object-cover shadow-sm"></a>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-6">
-                        <button onclick="navigate('page', 'about')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95 border-theme hover:shadow-md"><i data-lucide="info" class="w-5 h-5 text-theme"></i> About Us</button>
-                        <button onclick="navigate('page', 'privacy')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95 border-theme hover:shadow-md"><i data-lucide="shield" class="w-5 h-5 text-theme"></i> Privacy</button>
+                        <button onclick="navigate('page', 'about')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95 border-theme"><i data-lucide="info" class="w-5 h-5 text-theme"></i> About Us</button>
+                        <button onclick="navigate('page', 'privacy')" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center gap-2 font-bold text-gray-700 active:scale-95 border-theme"><i data-lucide="shield" class="w-5 h-5 text-theme"></i> Privacy</button>
                     </div>
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-8">
                         <h3 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="map-pin" class="text-theme"></i> Delivery Info</h3>
@@ -601,24 +386,28 @@
                             <button type="submit" id="save-prof-btn" class="bg-dark text-white px-6 py-3.5 rounded-xl font-bold active:scale-95 w-full">Save Details</button>
                         </form>
                     </div>
+                    
+                    <!-- FIXED: Order Status Prominently Displayed -->
                     <div>
                         <h3 class="text-xl font-black text-gray-900 mb-4">My Orders</h3>
                         <div class="space-y-4">
                             ${state.orders.length > 0 ? state.orders.map(order => {
                                 const orderDate = order.timestamp ? new Date(order.timestamp.seconds * 1000) : new Date();
                                 const isCancelable = order.status === 'Pending' && ((new Date() - orderDate) < 3 * 60 * 60 * 1000);
-                                const colors = { 'Pending': 'bg-yellow-100 text-yellow-700', 'Processing': 'bg-blue-100 text-blue-700', 'Shipped': 'bg-purple-100 text-purple-700', 'Delivered': 'bg-green-100 text-green-700', 'Cancelled': 'bg-red-100 text-red-700' };
+                                const colors = { 'Pending': 'bg-yellow-500 text-white', 'Processing': 'bg-blue-500 text-white', 'Shipped': 'bg-purple-500 text-white', 'Delivered': 'bg-green-500 text-white', 'Cancelled': 'bg-red-500 text-white' };
                                 return `
-                                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                                    <div class="flex justify-between items-start mb-4">
-                                        <div><p class="text-xs text-gray-500 font-bold uppercase">ID: #${order.id.slice(0,6)}</p><p class="text-sm font-medium text-gray-900 mt-1">${orderDate.toLocaleDateString()}</p></div>
-                                        <span class="${colors[order.status] || 'bg-gray-100'} px-3 py-1 rounded-full text-xs font-bold">${order.status}</span>
+                                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl font-bold text-xs ${colors[order.status] || 'bg-gray-500 text-white'} shadow-sm">
+                                        Status: ${order.status}
+                                    </div>
+                                    <div class="flex justify-between items-start mb-4 mt-2">
+                                        <div><p class="text-xs text-gray-500 font-bold uppercase">ID: #${order.id.slice(0,6)}</p><p class="text-sm font-medium text-gray-900 mt-1">${orderDate.toLocaleDateString()} - ${orderDate.toLocaleTimeString()}</p></div>
                                     </div>
                                     <div class="border-t border-gray-50 pt-3 space-y-1 mb-3">
                                         ${order.items.map(item => `<div class="flex justify-between text-sm"><span class="text-gray-600">${item.quantity}x ${item.name}</span><span class="font-bold text-gray-900">৳${item.currentPrice * item.quantity}</span></div>`).join('')}
                                     </div>
                                     <div class="flex justify-between items-center border-t border-gray-100 pt-3">
-                                        <span class="font-bold text-gray-500">Total</span><span class="font-black text-theme text-lg">৳${order.total}</span>
+                                        <span class="font-bold text-gray-500">Total Paid</span><span class="font-black text-theme text-lg">৳${order.total}</span>
                                     </div>
                                     ${isCancelable ? `<button onclick="cancelOrder('${order.id}')" class="mt-4 w-full bg-red-50 text-red-600 py-2.5 rounded-xl text-sm font-bold active:scale-95">Cancel Order</button>` : ''}
                                 </div>`;
@@ -628,20 +417,28 @@
                 </div>`;
         };
 
+        // FIXED: CMS Page Rendering Logic
         const renderPage = () => {
-            const pageType = state.currentProduct;
-            const title = pageType === 'about' ? 'About Us' : 'Privacy Policy';
-            const content = pageType === 'about' ? state.settings.general?.about : state.settings.general?.privacy;
+            const pageType = state.currentProduct; // Payload is either 'about' or 'privacy'
+            let title = '', content = '';
+            
+            if (pageType === 'about') {
+                title = 'About Us';
+                content = state.settings.general?.about;
+            } else if (pageType === 'privacy') {
+                title = 'Privacy Policy';
+                content = state.settings.general?.privacy;
+            }
+
             return `
                 <div class="max-w-3xl mx-auto bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm min-h-[60vh] mt-2">
                     <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-6 pb-4 border-b border-gray-100">${title}</h1>
-                    <div class="text-gray-600 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">${content || 'Content not updated yet.'}</div>
+                    <div class="text-gray-600 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">${content || 'Information not updated yet.'}</div>
                 </div>`;
         };
 
         const renderApp = () => {
-            const container = document.getElementById('app-content');
-            container.style.opacity = '0';
+            const container = document.getElementById('app-content'); container.style.opacity = '0';
             setTimeout(() => {
                 let html = '';
                 if (state.currentTab === 'home') html = renderHome();
@@ -651,23 +448,20 @@
                 else if (state.currentTab === 'product') html = renderProductDetails();
                 else if (state.currentTab === 'page') html = renderPage();
                 
-                container.innerHTML = html; lucide.createIcons();
-                container.style.opacity = '1';
+                container.innerHTML = html; lucide.createIcons(); container.style.opacity = '1';
             }, 150);
         };
 
-        // Actions 
         window.loginWithGoogle = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); showToast("Successfully signed in!"); } catch (e) { showToast(e.message, "error"); } };
-        window.logout = async () => { try { await signOut(auth); await signInAnonymously(auth); state.profile = null; state.orders = []; showToast("Signed out."); navigate('home'); } catch (e) { console.error(e); } };
+        window.logout = async () => { try { await signOut(auth); await signInAnonymously(auth); state.profile = null; state.orders = []; showToast("Signed out."); navigate('home'); } catch (e) {} };
         window.saveProfile = async (e) => { e.preventDefault(); const btn = document.getElementById('save-prof-btn'); btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline"></i>`; try { await setDoc(doc(db, 'artifacts', APP_ID, 'users', state.user.uid, 'profile', 'info'), { phone: document.getElementById('prof-phone').value, address: document.getElementById('prof-address').value, updatedAt: serverTimestamp() }, {merge: true}); state.profile = {...state.profile, phone: document.getElementById('prof-phone').value, address: document.getElementById('prof-address').value}; showToast("Profile saved!"); } catch (e) { showToast("Failed", "error"); } finally { btn.innerHTML = `Save Details`; } };
-        window.cancelOrder = async (orderId) => { if(!confirm("Cancel order?")) return; try { await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'orders', orderId), { status: "Cancelled" }); showToast("Order cancelled."); await fetchUserData(); renderApp(); } catch (e) { showToast("Error", "error"); } };
+        window.cancelOrder = async (orderId) => { if(!confirm("Cancel order?")) return; try { await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'orders', orderId), { status: "Cancelled" }); showToast("Order cancelled."); await fetchUserData(); renderApp(); } catch (e) {} };
 
         const handleSearch = (e) => { state.searchQuery = e.target.value; if(state.currentTab !== 'home') navigate('home'); else renderApp(); };
         document.getElementById('searchInputDesk').addEventListener('input', handleSearch); document.getElementById('searchInputMob').addEventListener('input', handleSearch);
 
         window.onload = async () => {
-            updateCartBadge();
-            await fetchPublicData();
+            updateCartBadge(); await fetchPublicData();
             onAuthStateChanged(auth, async (user) => {
                 state.user = user;
                 if (!user) signInAnonymously(auth).catch(e=>e);
